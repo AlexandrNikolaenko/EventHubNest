@@ -1,0 +1,162 @@
+/* стилизация шапки */
+
+header {
+  z-index: 100;
+  width: 100%;
+  position: fixed;
+  padding: 16px 0;
+  background-color: white;
+}
+
+header .wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header__nav-list {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.nav_link {
+  padding: 8px 22px;
+  border-radius: 10px;
+  background-color: transparent;
+  transition: all 0.15s;
+  line-height: 26px;
+}
+
+.nav_link:hover,
+.nav_link:focus {
+  background-color: rgba(96, 125, 139, 0.25);
+}
+
+.nav_link.active,
+.nav_link.active:active,
+.nav_link:active,
+.nav_link.active:hover,
+.nav_link.active:focus {
+  background-color: var(--primary);
+  color: var(--primary-contrast-text);
+}
+
+header .header__button-enter {
+  filter: var(--shadow-light);
+}
+
+.header__button-enter.hide {
+  display: none;
+}
+
+nav.nav_bar {
+  filter: var(--shadow-light);
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: white;
+}
+
+.nav_bar .wrapper {
+  display: none;
+  justify-content: space-around;
+}
+
+.nav_bar__link {
+  margin: 10px;
+  padding: 15px;
+  border-radius: 100px;
+}
+
+.nav_bar__link:active,
+.nav_bar__link:hover,
+.nav_bar__link:focus {
+  background-color: var(--primary-light);
+}
+
+.nav_bar__link.active {
+  background-color: var(--secondary);
+}
+
+.nav_bar__link.active svg path {
+  stroke: var(--primary-contrast-text);
+}
+
+@media screen and (max-width: 768px) {
+  .nav_link {
+    display: none;
+  }
+
+  .nav_bar .wrapper {
+    display: flex;
+  }
+}
+
+/* #menu-bar{
+  padding: 0;
+  background: none;
+  line-height: 0;
+} */
+
+.logout {
+  display: none;
+}
+
+.logout.active {
+  display: block;
+}
+
+#header__menu__list.disable {
+  position: absolute;
+  display: none;
+  flex-direction: column;
+  gap: 20px;
+  background-color: white;
+  border-radius: 10px;
+  filter: var(--shadow-base);
+  padding: 20px;
+  width: 80vw;
+  right: -80%;
+  top: 60px;
+}
+
+#header__menu__list.enable {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background-color: white;
+  border-radius: 10px;
+  filter: var(--shadow-base);
+  padding: 20px;
+  width: 80vw;
+  right: -80%;
+  top: 60px;
+}
+/* стилизация подвала */
+
+footer {
+  width: 100%;
+  padding: 16px 0;
+  background-color: white;
+}
+
+footer .wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media screen and (max-width: 768px) {
+  footer {
+    padding: 30px 0 75px 0;
+  }
+
+  footer .wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+  }
+}

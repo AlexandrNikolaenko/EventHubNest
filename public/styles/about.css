@@ -1,0 +1,176 @@
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 157px;
+  align-items: center;
+}
+
+section:first-child {
+  padding-top: 203px;
+}
+
+section:last-child {
+  padding-bottom: 157px;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+p.h6 {
+  text-align: center;
+  max-width: 1000px;
+}
+
+h1,
+h2,
+h3 {
+  text-align: center;
+}
+
+h1 {
+  color: var(--secondary);
+}
+
+.h6 strong {
+  color: var(--secondary);
+}
+
+ul {
+  display: flex;
+  gap: 10px;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+ul li {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: white;
+  filter: var(--shadow-light);
+}
+
+ul li span {
+  font-size: 96px;
+  line-height: 80px;
+  color: var(--secondary);
+  font-weight: 700;
+}
+
+ol {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+ol li {
+  padding: 20px;
+  text-align: center;
+  width: calc(100% - 40px);
+  background-color: white;
+  border-radius: 10px;
+  filter: var(--shadow-light);
+}
+
+.step-arrow {
+  background: url('../images/step-arrow.svg');
+  min-width: 48px;
+  height: 48px;
+}
+
+.code-section div {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.phylosofy-section {
+  display: flex;
+  max-width: 581px;
+}
+
+.phylosofy-section p {
+  text-align: center;
+}
+
+.phylosofy-section del {
+  color: var(--primary-light);
+}
+
+.phylosofy-section ins {
+  color: var(--secondary);
+}
+
+blockquote {
+  font-style: italic;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  border-left: 4px solid var(--secondary);
+  padding: 10px;
+  margin: 15px 0;
+  filter: var(--shadow-light);
+}
+
+pre {
+  background: #222;
+  color: #f8f8f2;
+  padding: 10px;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+code {
+  font-family: 'Courier New', monospace;
+}
+
+@media screen and (max-width: 1440px) {
+  ul {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  ul li {
+    width: auto;
+  }
+
+  ol li {
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  ol {
+    flex-direction: column;
+  }
+
+  .step-arrow {
+    transform: rotate(90deg);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .code-section p {
+    text-align: center;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  ul {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}

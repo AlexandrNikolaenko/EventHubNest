@@ -1,0 +1,77 @@
+<section class="button-line wrapper">
+    <a href="/main.html">
+        <button class="primary outline">
+        <img src="/images/arrow-left.svg" />Назад
+        </button>
+    </a>
+    <button id="edit-event-button" class="primary outline">
+        Редактировать<img src="/images/edit.svg" />
+    </button>
+    </section>
+    <div class="img-container wrapper">
+    <img src="/images/theatre.jpg" />
+    </div>
+    <section class="info-section wrapper">
+    <div class="main-info">
+        <h2 class="title"></h2>
+        <p class="desc"></p>
+    </div>
+    <div class="additional-info">
+        <div class="body1">
+        Организатор:
+        <span class="author"></span>
+        </div>
+        <div class="body1">
+        Место встречи:
+        <span class="place"></span>
+        </div>
+        <div class="body1">
+        Дата:
+        <span class="date"></span>
+        </div>
+        Участники:
+        <ul id="users-list"></ul>
+    </div>
+    </section>
+</main>
+<div id="edit-event-modal">
+    <form id="edit-event-form" class="modal">
+    <label for="title" class="body1">Введите название *</label>
+    <input
+        id="edit-title"
+        autocomplete="off"
+        name="title"
+        placeholder="Title"
+    />
+    <span class="body1" id="edit-title-error">Это поле обязательное</span>
+    <label for="desc" class="body1">Введите описание *</label>
+    <input
+        id="edit-desc"
+        autocomplete="off"
+        name="desc"
+        placeholder="Description"
+    />
+    <span class="body1" id="edit-desc-error">Это поле обязательное</span>
+    <label for="date" class="body1">Введите дату проведения *</label>
+    <input
+        id="edit-date"
+        autocomplete="off"
+        name="date"
+        placeholder="Date"
+        type="date"
+    />
+    <span class="body1" id="edit-date-error">Это поле обязательное</span>
+    <label for="place" class="body1"
+        >Укажите место проведения проведения *</label
+    >
+    <input
+        id="edit-place"
+        autocomplete="off"
+        name="place"
+        placeholder="Coordinates"
+    />
+    <span class="body1" id="edit-place-error">Это поле обязательное</span>
+    <button class="primary" type="submit">Сохранить</button>
+    <button class="primary outline" id="close-edit-modal">Отменить</button>
+    </form>
+</div>

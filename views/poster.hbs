@@ -1,0 +1,29 @@
+<h2>Афиша мероприятий</h2>
+<section id='filter-section'>
+  <form id='search-form' class='search-events'>
+    <input
+      class='search__input'
+      name='search'
+      placeholder='Найти мероприятие по названию'
+    />
+    <button type='submit' class='search__button'>
+      <img src='/images/search.svg' />
+    </button>
+  </form>
+</section>
+<section id='poster-section'>
+  <span id='query-error' class='h6 hide'></span>
+  <div id='poster__empty' class='hide poster__empty'>
+    <span class='h6'> Ничего не нашлось :( </span>
+    <p class='body1'>
+      У вас сейчас нет активных мероприятий, но вы можете создать новое
+    </p>
+  </div>
+  <ul id='poster-list'>
+    <li class='preloader'></li>
+    <li class='preloader'></li>
+    <li class='preloader'></li>
+    <li class='preloader'></li>
+    <li class='preloader'></li>
+  </ul>
+</section>

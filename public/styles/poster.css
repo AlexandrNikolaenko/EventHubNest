@@ -1,0 +1,143 @@
+main {
+  padding: 150px 0 50px 0;
+  min-height: calc(100vh - 200px);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1240px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+@media screen and (max-width: 1440px) {
+  main {
+    margin: 0 100px;
+    max-width: 100%;
+    width: auto;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  main {
+    margin: 0 40px;
+  }
+}
+
+.poster__empty {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  align-items: center;
+  padding: 50px 0;
+}
+
+.search-events {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.search-events input {
+  border: var(--primary-light) 1px solid;
+  border-radius: 10px;
+  width: 100%;
+  appearance: none;
+  padding: 8px 20px;
+}
+
+.search-events input:active,
+input:focus {
+  outline: none;
+  appearance: none;
+}
+
+.search-events button.search__button {
+  padding: 5px;
+  line-height: 0;
+  border-radius: 10px;
+  border: var(--primary) 1px solid;
+  background-color: white;
+}
+
+.search-events button img {
+  width: 20px;
+  aspect-ratio: 1/1;
+}
+
+.hide {
+  display: none !important;
+}
+
+#poster-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.post {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  padding: 20px;
+  border-radius: 30px;
+  filter: var(--shadow-base);
+  background-color: white;
+}
+
+.post-media {
+  max-width: 300px;
+  width: 100%;
+  aspect-ratio: 300/260;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  border-radius: 10px;
+}
+
+.post-content {
+  height: max-content;
+  max-width: 500px;
+  display: flex;
+  gap: 15px;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+@media screen and (max-width: 1171px) {
+  .post {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .post-content,
+  .post-media {
+    max-width: none;
+  }
+}
+
+@keyframes flickering {
+  from {
+    opacity: 0.25;
+  }
+
+  50% {
+    opacity: 0.15;
+  }
+
+  to {
+    opacity: 0.25;
+  }
+}
+
+.preloader {
+  width: 100%;
+  height: 300px;
+  background-color: var(--primary-light);
+  border-radius: 10px;
+  animation-name: flickering;
+  animation-iteration-count: infinite;
+  animation-duration: 2s;
+}

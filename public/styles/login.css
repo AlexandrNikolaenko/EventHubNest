@@ -1,0 +1,60 @@
+main {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: white;
+  max-width: 400px;
+  width: 100%;
+  filter: var(--shadow-light);
+}
+
+input {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  outline: none;
+  padding: 12px;
+  border-radius: 10px;
+  border: var(--primary) 1px solid;
+}
+
+span {
+  color: var(--error);
+  display: none;
+}
+
+span.active {
+  display: block;
+}
+
+p.body1 {
+  width: 100%;
+  text-align: center;
+}
+
+p.body1 a {
+  color: var(--secondary);
+}
+
+@media screen and (max-width: 640px) {
+  form {
+    margin: 0 40px;
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  form {
+    margin: 0 20px;
+    width: 100%;
+  }
+}

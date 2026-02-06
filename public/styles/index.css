@@ -1,0 +1,263 @@
+h1,
+h2 {
+  text-align: center;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 40px 0;
+}
+
+section:first-child {
+  padding-top: 0;
+  height: 100vh;
+  justify-content: center;
+}
+
+#preview .block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  max-width: 980px;
+}
+
+#steps {
+  gap: 68px;
+}
+
+#steps .block {
+  width: 100%;
+  max-width: 1030px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.step-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: start;
+  padding: 24px;
+  border-radius: 10px;
+  background-color: white;
+  filter: var(--shadow-light);
+}
+
+.step-card h4 {
+  color: var(--secondary);
+}
+
+.step-card .body1 {
+  color: var(--primary-light);
+}
+
+#events {
+  gap: 40px;
+}
+
+#events .head {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+#events h5 {
+  text-align: center;
+  max-width: 1006px;
+}
+
+#events ul {
+  display: flex;
+  gap: 30px;
+  flex-wrap: nowrap;
+  width: 100%;
+  overflow: visible;
+}
+
+.event-card {
+  width: 1fr;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: white;
+  filter: var(--shadow-light);
+}
+
+.event-card .card-media {
+  width: 100%;
+  aspect-ratio: 393/240;
+  background: url(../images/theatre.jpg) center;
+  background-size: cover;
+}
+
+.event-card .card-header,
+.event-card .card-content {
+  padding: 16px;
+}
+
+.event-card .card-action {
+  padding: 8px;
+}
+
+#why {
+  gap: 50px;
+}
+
+#why .block {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  width: 100%;
+  gap: 30px;
+}
+
+.why-card {
+  background-color: white;
+  border-radius: 10px;
+  display: flex;
+  gap: 20px;
+  padding: 40px 50px;
+  align-items: center;
+  filter: var(--shadow-light);
+}
+
+#who {
+  gap: 50px;
+}
+
+#who .block {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.who-card {
+  display: flex;
+  gap: 40px;
+  padding: 0 40px 0 0;
+  border-radius: 10px;
+  background-color: white;
+  overflow: hidden;
+  filter: var(--shadow-light);
+}
+
+.who-card.reverse {
+  flex-direction: row-reverse;
+  padding: 0 0 0 40px;
+}
+
+.who-card .card-media {
+  width: 100%;
+  aspect-ratio: 580/344;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.who-card img {
+  width: 110%;
+}
+
+.who-card .card-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.who-card h4 {
+  text-align: center;
+}
+
+#try {
+  justify-content: center;
+  gap: 30px;
+}
+
+h1 span,
+h2 span,
+h4 span {
+  color: var(--secondary);
+}
+
+h1,
+h6 {
+  text-align: center;
+}
+
+.event-card {
+  min-width: 320px;
+}
+
+@media screen and (max-width: 1440px) {
+  #events ul {
+    overflow-x: scroll;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  #steps .block {
+    width: 100%;
+    max-width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  #why .block {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #try h5 {
+    text-align: center;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  #steps .block {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .why-card {
+    padding: 30px;
+  }
+
+  #who .block {
+    gap: 20px;
+  }
+
+  .who-card {
+    flex-direction: column;
+    padding: 0 0 30px 0;
+    gap: 20px;
+  }
+
+  .who-card h4 {
+    width: 100%;
+    padding: 0 20px;
+  }
+
+  .who-card.reverse {
+    flex-direction: column-reverse;
+    padding: 30px 0 0 0;
+  }
+}
+
+@media screen and (max-width: 640px) {
+  #events ul {
+    flex-direction: column;
+    overflow: visible;
+  }
+}
+
+@media screen and (max-width: 425px) {
+}

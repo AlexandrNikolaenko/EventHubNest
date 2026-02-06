@@ -1,0 +1,40 @@
+section {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.post-media {
+  max-width: none;
+}
+
+.post-content {
+  width: 100%;
+  max-width: none;
+}
+
+@media screen and (max-width: 800px) {
+  section {
+    flex-direction: column;
+  }
+}
+
+#empty-state {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 30px;
+  width: 100%;
+}
+
+.preloader {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 300/260;
+}
+
+@media screen and (max-width: 800px) {
+  section {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,42 @@
+<section class='wrapper event-actions'>
+  <div class='append-event'>
+    <button class='create-event'>Создать событие</button>
+    <button class='gen-event secondary'>Сгенерировать событие</button>
+  </div>
+  <form id='search-form' class='search-events'>
+    <input
+      class='search__input'
+      name='search'
+      placeholder='Найти мероприятие по названию'
+    />
+    <button type='submit' class='search__button'>
+      <img src='/images/search.svg' />
+    </button>
+  </form>
+  <div class='vision-info'>
+    <button id='by-list' class='change-visible'>В виде списка</button>
+    <button id='by-table' class='change-visible'>В виде таблицы</button>
+  </div>
+</section>
+<section class='events wrapper'>
+  <div id='events__empty' class='events__empty'>
+    <span class='h6'> Ничего не нашлось :( </span>
+    <p class='body1'>
+      У вас сейчас нет активных мероприятий, но вы можете создать новое
+    </p>
+  </div>
+  <ul id='events-list' class='hide events-list'></ul>
+  <table id='events-table' class='hide events-table'>
+    <thead>
+      <tr>
+        <th scope='col'>ID</th>
+        <th scope='col'>Title</th>
+        <th scope='col'>Description</th>
+        <th scope='col'>Author</th>
+        <th scope='col'>Date</th>
+        <th scope='col'>Place</th>
+      </tr>
+    </thead>
+    <tbody id='events-table-body'></tbody>
+  </table>
+</section>

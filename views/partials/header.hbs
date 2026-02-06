@@ -1,0 +1,17 @@
+<header>
+  <nav class='wrapper'>
+    <a class='h6 logo' href='/'> Together </a>
+    {{#unless isGuest}}
+    <div class='header__nav-list'>
+        {{> nav-link href='/' text='Главная'}}
+        {{> nav-link href='/poster' text='Афиша'}}
+        {{> nav-link href='/main' text='Создать событие'}}
+        {{> nav-link href='/about' text='О нас'}}
+        <a href='/auth/login.html' class='header__button-enter'>
+          <button class='secondary'>Войти</button>
+        </a>
+        <button class='logout error'>Выйти</button>
+    </div>
+    {{/unless}}
+  </nav>
+</header>

@@ -1,0 +1,19 @@
+<form id='login'>
+  <label for='email' class='body1'>Введите почту</label>
+  <input
+    id='email'
+    autocomplete='off'
+    name='email'
+    placeholder='Email'
+    type='email'
+  />
+  <span class='body1' id='email-error'>Почта введена некорректно</span>
+  <label for='password' class='body1'>Введите пароль</label>
+  <input id='password' name='password' placeholder='Password' type='password' />
+  <span class='body1' id='password-error'>Неверный пароль</span>
+  <button class='primary' type='submit'>Войти</button>
+  <p class='body1'>
+    Еще не зарегистрированы?
+    <a href='/auth/register'>Зарегистрироваться</a>
+  </p>
+</form>
