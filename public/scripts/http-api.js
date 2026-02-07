@@ -20,7 +20,7 @@ class HttpRequest {
     } catch (e) {
       console.log(e);
       if (onError) onError(e);
-      if (e.message == '401') redirectPath = '/auth/login.html';
+      if (e.message == '401') redirectPath = '/auth/login';
       return e;
     } finally {
       if (redirectPath != '') window.location.assign(redirectPath);

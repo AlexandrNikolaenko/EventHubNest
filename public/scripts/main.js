@@ -1,6 +1,6 @@
 import { store, user } from './api.js';
 
-if (!user.getUser().email) window.location.assign('/EventHub/auth/login.html');
+if (!user.getUser().email) window.location.assign('/auth/login.html');
 
 function handleChangeVision(param) {
   if (param == 'list') {
@@ -57,14 +57,14 @@ function loadEvents(search) {
       // добавляем списко карточек
       const eventCard = eventTemplate.cloneNode(true);
       eventCard.querySelector('.card-media').style.background =
-        `url(${event.image || './images/theatre.jpg'})`;
+        `url(${event.image || '/images/theatre.jpg'})`;
       eventCard.querySelector('.card-header').textContent = event.title;
       eventCard.querySelector('.event-author').textContent = event.author;
       eventCard.querySelector('.event-description').textContent = event.desc;
       eventCard.querySelector('.event-date').textContent = event.date;
       eventCard.querySelector('.event-place').textContent = event.place;
       const link = eventCard.querySelector('.event-button');
-      link.setAttribute('href', `./event.html?id=${event.id}`);
+      link.setAttribute('href', `/poster/event?id=${event.id}`);
       eventCard
         .querySelector('.remove-button')
         .addEventListener('click', (e) => handleRemoveEvent(e, event.id));
