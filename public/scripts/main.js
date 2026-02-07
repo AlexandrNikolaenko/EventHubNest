@@ -1,6 +1,6 @@
 import { store, user } from './api.js';
 
-if (!user.getUser().email) window.location.assign('/auth/login.html');
+if (!user.getUser().email) window.location.assign('/auth/login');
 
 function handleChangeVision(param) {
   if (param == 'list') {

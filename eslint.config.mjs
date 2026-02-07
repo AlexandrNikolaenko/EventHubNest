@@ -8,10 +8,17 @@ export default tseslint.config(
   {
     ignores: ['eslint.config.mjs'],
   },
+
+  // Базовые рекомендации ESLint
   eslint.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked,
-  eslintPluginPrettierRecommended,
+
+  // TypeScript — ТОЛЬКО для .ts
   {
+    files: ['**/*.ts'],
+    extends: [
+      ...tseslint.configs.recommendedTypeChecked,
+      eslintPluginPrettierRecommended,
+    ],
     languageOptions: {
       globals: {
         ...globals.node,
@@ -23,13 +30,25 @@ export default tseslint.config(
         tsconfigRootDir: import.meta.dirname,
       },
     },
-  },
-  {
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/no-unsafe-argument': 'warn',
       'prettier/prettier': ['error', { endOfLine: 'auto' }],
+    },
+  },
+
+  // JavaScript — БЕЗ TypeScript project service
+  {
+    files: ['**/*.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+      sourceType: 'commonjs',
+      parserOptions: {
+        project: null,
+      },
     },
   },
 );
