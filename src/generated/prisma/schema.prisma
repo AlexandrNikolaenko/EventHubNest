@@ -1,0 +1,69 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String @unique
+  password String
+
+  posts          Post[]
+  authoredEvents Event[]        @relation("EventAuthor")
+  registrations  Registration[]
+}
+
+model Event {
+  id    Int      @id @default(autoincrement())
+  title String
+  desc  String
+  date  DateTime
+  place String
+
+  authorId Int
+  author   User @relation("EventAuthor", fields: [authorId], references: [id])
+
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  registrations Registration[]
+}
+
+model Registration {
+  id Int @id @default(autoincrement())
+
+  userId  Int
+  eventId Int
+
+  user  User  @relation(fields: [userId], references: [id])
+  event Event @relation(fields: [eventId], references: [id])
+
+  @@unique([userId, eventId])
+}
+
+model Post {
+  id    Int      @id @default(autoincrement())
+  title String
+  desc  String
+  date  DateTime
+  place String
+
+  authorId Int
+  author   User @relation(fields: [authorId], references: [id])
+
+  categoryId Int?
+  category   Category? @relation(fields: [categoryId], references: [id])
+}
+
+model Category {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  events Event[]
+  posts  Post[]
+}
