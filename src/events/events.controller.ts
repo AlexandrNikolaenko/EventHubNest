@@ -44,7 +44,7 @@ export class ApiEventsController {
 
 @Controller('events')
 export class EventsController {
-  constructor(private readonly eventsService: EventsService) {}
+  constructor() {}
 
   @Get()
   @Render('main')

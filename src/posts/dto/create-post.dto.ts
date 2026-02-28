@@ -18,5 +18,9 @@ export class CreatePostDto {
 
   @IsString()
   @IsNotEmpty()
+  image: string;
+
+  @IsString()
+  @IsNotEmpty()
   authorId: number;
 }

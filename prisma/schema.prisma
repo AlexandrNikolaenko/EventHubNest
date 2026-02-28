@@ -43,6 +43,7 @@ model Post {
   id         Int       @id @default(autoincrement())
   title      String
   desc       String
+  image      String
   date       DateTime
   place      String
   authorId   Int

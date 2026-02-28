@@ -2,7 +2,7 @@ class HttpRequest {
   #api_host;
 
   constructor() {
-    this.#api_host = 'https://67dc4306e00db03c406778bd.mockapi.io/api';
+    this.#api_host = 'http://localhost:3000/api';
   }
 
   async get({ onError, onSuccess, query }) {
@@ -37,7 +37,7 @@ export default class Api {
 
   async getEvents(onSuccess, onError, query = '') {
     return await this.#httpRequest.get({
-      query: '/events' + query,
+      query: '/posts' + query,
       onSuccess,
       onError,
     });
@@ -45,7 +45,7 @@ export default class Api {
 
   async getEvent(id, onSuccess, onError) {
     return await this.#httpRequest.get({
-      query: '/events/' + id,
+      query: '/posts/' + id,
       onSuccess,
       onError,
     });

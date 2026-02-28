@@ -2,61 +2,34 @@ import { Injectable } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { EventsRepository } from './entities/events.repository';
 
 @Injectable()
 export class EventsService {
-  constructor(private prisma: PrismaService) {}
+  private repository: EventsRepository;
+  constructor(private prisma: PrismaService) {
+    this.repository = new EventsRepository(prisma);
+  }
 
   create(dto: CreateEventDto) {
-    return this.prisma.event.create({
-      data: {
-        title: dto.title,
-        desc: dto.desc,
-        date: new Date(dto.date),
-        place: dto.place,
-        authorId: dto.authorId,
-        categoryId: dto.categoryId,
-      },
-    });
+    return this.repository.create(dto);
   }
 
   findAll() {
-    return this.prisma.event.findMany({
-      include: {
-        author: true,
-        category: true,
-        registrations: true,
-      },
-      orderBy: {
-        date: 'asc',
-      },
-    });
+    return this.repository.findAll();
   }
 
   findOne(id: number) {
-    return this.prisma.event.findUnique({
-      where: { id },
-      include: {
-        author: true,
-        category: true,
-        registrations: true,
-      },
-    });
+    return this.repository.findOne(id);
   }
 
   update(id: number, dto: UpdateEventDto) {
-    return this.prisma.event.update({
-      where: { id },
-      data: {
-        ...dto,
-        date: dto.date ? new Date(dto.date) : undefined,
-      },
+    return this.repository.update(id, {
+      ...dto,
     });
   }
 
   remove(id: number) {
-    return this.prisma.event.delete({
-      where: { id },
-    });
+    return this.repository.remove(id);
   }
 }

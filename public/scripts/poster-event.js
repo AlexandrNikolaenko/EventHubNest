@@ -1,6 +1,6 @@
 import Api from './http-api.js';
 
-const eventId = Number(document.location.search.split('=')[1]);
+const eventId = Number(document.location.pathname.split('/')[2]);
 
 function loadEvent() {
   return new Promise((resolve, reject) => {
