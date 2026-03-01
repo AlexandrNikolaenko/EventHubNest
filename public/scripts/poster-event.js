@@ -19,7 +19,7 @@ function handleSuccess(data) {
   post.querySelector('.post-media').style =
     'background-image: url(' + data.image + ')';
   post.querySelector('h6').textContent = data.title;
-  post.querySelector('p').textContent = data.description;
+  post.querySelector('p').textContent = data.desc;
   post.querySelector('.date').textContent = data.date;
   post.querySelector('.place').textContent = data.place;
 
@@ -43,7 +43,6 @@ function handleError(e) {
 function renderData() {
   loadEvent()
     .then((data) => {
-      console.log(data);
       handleSuccess(data);
     })
     .catch(handleError);

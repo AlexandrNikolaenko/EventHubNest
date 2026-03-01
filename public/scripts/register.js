@@ -1,6 +1,7 @@
 // форма регистрации
 
 import { register } from './api.js';
+import Api from './http-api.js';
 
 // ==========================================
 // НАБОР ПРАВИЛ ДЛЯ ВАЛИДАЦИИ
@@ -74,7 +75,7 @@ function handleSubmit(e) {
     });
   } else {
     try {
-      register(values);
+      (new Api()).register(values);
     } catch (err) {
       try {
         const error = JSON.parse(err.message);

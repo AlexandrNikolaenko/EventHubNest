@@ -1,26 +1,53 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { LoginDto } from './dto/login.dto';
+import { AuthRepository } from './entities/auth.repository';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { RegisterDto } from './dto/register.gto';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  private authRepository: AuthRepository;
+  constructor(private prisma: PrismaService) {
+    this.authRepository = new AuthRepository(prisma);
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  async login(dto: LoginDto) {
+    const user = await this.authRepository.findOne(dto.email);
+
+    if (!user) {
+      throw new NotFoundException({
+        type: 'email',
+        message: 'Пользователя с такой почтой не существует',
+      });
+    }
+
+    if (user.password !== dto.password) {
+      throw new UnauthorizedException({
+        type: 'password',
+        message: 'Неверный пароль',
+      });
+    }
+
+    return { userId: user.id };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
+  async register(dto: RegisterDto) {
+    const existingUser = await this.authRepository.findOne(dto.email);
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
+    if (existingUser) {
+      throw new BadRequestException({
+        type: 'email',
+        message: 'Пользователь с такой почтой уже существует',
+      });
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    const user = await this.authRepository.create(dto);
+
+    return { userId: user.id };
   }
 }

@@ -78,28 +78,22 @@ class Store {
 
 class User {
   constructor() {
-    this.name;
-    this.email;
-    this.password;
+    this.id
   }
 
-  updateUser(email) {
-    window.localStorage.setItem('activeUser', email);
-    const user = store.getUserByEmail(email);
-    this.email = user.email;
-    this.name = user.name;
-    this.password = user.password;
+  updateUser(id) {
+    this.id = id;
+    window.localStorage.setItem('activeUser', id);
   }
 
   deleteUser() {
-    [this.name, this.email, this.password] = [undefined, undefined, undefined];
+    this.id = undefined;
     window.localStorage.removeItem('activeUser');
   }
 
   getUser() {
     return {
-      name: this.name,
-      email: this.email,
+      id: this.id,
     };
   }
 

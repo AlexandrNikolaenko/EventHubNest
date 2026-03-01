@@ -8,10 +8,10 @@ const page = document.location.pathname;
 
 Array.from(links).forEach((link) => {
   if (
-    ((page == '/' || page == '/') && link.getAttribute('href') == '/') ||
-    (page == '/main/' && link.getAttribute('href') == '/main') ||
-    (page == '/about/' && link.getAttribute('href') == '/about') ||
-    (page == '/poster/' && link.getAttribute('href') == '/poster')
+    (page == '/' && link.getAttribute('href') == '/') ||
+    ((page == '/events/' || page == '/events') && link.getAttribute('href') == '/events') ||
+    ((page == '/about/' || page == '/about') && link.getAttribute('href') == '/about') ||
+    ((page == '/posts/' || page == '/posts') && link.getAttribute('href') == '/posts')
   ) {
     link.classList.add('active');
   }
@@ -20,9 +20,9 @@ Array.from(links).forEach((link) => {
 Array.from(navBarLinks).forEach((link) => {
   if (
     ((page == '/' || page == '/') && link.getAttribute('href') == '/') ||
-    (page == '/main/' && link.getAttribute('href') == '/main') ||
-    (page == '/about/' && link.getAttribute('href') == '/about') ||
-    (page == '/poster/' && link.getAttribute('href') == '/poster')
+    ((page == '/events/' || page == '/events') && link.getAttribute('href') == '/events') ||
+    ((page == '/about/' || page == '/about') && link.getAttribute('href') == '/about') ||
+    ((page == '/posts/' || page == '/posts') && link.getAttribute('href') == '/posts')
   ) {
     link.classList.add('active');
   }
@@ -30,7 +30,7 @@ Array.from(navBarLinks).forEach((link) => {
 
 // вход в аккаунт и выход из аккаунта пользователя
 
-if (user.email) {
+if (user.getUser().id) {
   const links = document.getElementsByClassName('logout');
   Array.from(links).forEach((link) => {
     link.classList.add('active');

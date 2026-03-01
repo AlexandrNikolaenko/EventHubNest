@@ -19,10 +19,10 @@ function handleSuccess(data) {
     post.querySelector('.post-media').style =
       'background-image: url(' + elem.image + ')';
     post.querySelector('h6').textContent = elem.title;
-    post.querySelector('p').textContent = elem.description;
+    post.querySelector('p').textContent = elem.desc;
     post.querySelector('.date').textContent = elem.date;
     post.querySelector('.place').textContent = elem.place;
-    post.querySelector('a').setAttribute('href', '/poster/event?id=' + elem.id);
+    post.querySelector('a').setAttribute('href', '/posts/' + elem.id);
 
     list.appendChild(post);
   });

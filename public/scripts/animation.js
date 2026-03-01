@@ -78,21 +78,3 @@ function handleButtonClick() {
 }
 
 handleButtonClick();
-
-// текст с эфектом волны
-
-function textWave() {
-  const wave = document.querySelector('.wave-text');
-  const letters = wave.textContent.split('');
-  wave.innerHTML = letters
-    .map((l) => `<span class="letter">${l}</span>`)
-    .join('');
-
-  anime({
-    targets: '.wave-text .letter',
-    translateY: [20, 0],
-    opacity: [0, 1],
-    delay: anime.stagger(60),
-    easing: 'easeOutExpo',
-  });
-}
