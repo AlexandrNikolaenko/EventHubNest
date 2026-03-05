@@ -17,13 +17,13 @@ export class ApiEventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Post()
-  create(@Body() dto: CreateEventDto) {
-    return this.eventsService.create(dto);
+  create(@Body() { authorId, dto }: { authorId: number; dto: CreateEventDto }) {
+    return this.eventsService.create(authorId, dto);
   }
 
   @Get()
   findAll(@Param('userId') userId: string) {
-    return this.eventsService.findAll(userId);
+    return this.eventsService.findAll(Number(userId));
   }
 
   @Get(':id')
@@ -32,8 +32,11 @@ export class ApiEventsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateEventDto) {
-    return this.eventsService.update(Number(id), dto);
+  update(
+    @Param('id') id: string,
+    @Body() { authorId, dto }: { authorId: number; dto: UpdateEventDto },
+  ) {
+    return this.eventsService.update(Number(id), authorId, dto);
   }
 
   @Delete(':id')

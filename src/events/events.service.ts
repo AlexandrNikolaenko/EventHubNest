@@ -11,11 +11,11 @@ export class EventsService {
     this.repository = new EventsRepository(prisma);
   }
 
-  create(dto: CreateEventDto) {
-    return this.repository.create(dto);
+  create(authorId: number, dto: CreateEventDto) {
+    return this.repository.create(authorId, dto);
   }
 
-  findAll(userId: string) {
+  findAll(userId: number) {
     return this.repository.findAll(userId);
   }
 
@@ -23,8 +23,8 @@ export class EventsService {
     return this.repository.findOne(id);
   }
 
-  update(id: number, dto: UpdateEventDto) {
-    return this.repository.update(id, {
+  update(id: number, userId: number, dto: UpdateEventDto) {
+    return this.repository.updateEvent(id, userId, {
       ...dto,
     });
   }
