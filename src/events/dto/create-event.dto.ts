@@ -1,27 +1,28 @@
-import { IsString, IsNotEmpty, IsDateString, IsInt } from 'class-validator';
-import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsDateString,
+  IsEmail,
+  IsInt,
+  IsString,
+} from 'class-validator';
 
 export class CreateEventDto {
   @IsString()
-  @IsNotEmpty()
   title: string;
 
   @IsString()
-  @IsNotEmpty()
   desc: string;
+
+  @IsString()
+  place: string;
 
   @IsDateString()
   date: string;
 
-  @IsString()
-  @IsNotEmpty()
-  place: string;
-
-  @Type(() => Number)
-  @IsInt()
-  authorId: number;
-
-  @Type(() => Number)
   @IsInt()
   categoryId: number;
+
+  @IsArray()
+  @IsEmail({}, { each: true })
+  participants: string[];
 }

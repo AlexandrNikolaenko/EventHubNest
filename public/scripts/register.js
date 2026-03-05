@@ -1,7 +1,7 @@
 // форма регистрации
 
-import { register } from './api.js';
 import Api from './http-api.js';
+import { user } from './api.js';
 
 // ==========================================
 // НАБОР ПРАВИЛ ДЛЯ ВАЛИДАЦИИ
@@ -61,6 +61,24 @@ function initState() {
   });
 }
 
+function onSuccess(data) {
+  console.log(data);
+  user.updateUser(data.userId);
+  window.location.assign('/events');
+  return;
+}
+
+function onError(err) {
+  try {
+    console.log(err);
+    const message = document.getElementById(err.type + '-error');
+    message.classList.add('active');
+    message.textContent = err.message;
+  } catch (e) {
+    console.log(e);
+  }
+}
+
 function handleSubmit(e) {
   e.preventDefault();
   initState();
@@ -75,16 +93,9 @@ function handleSubmit(e) {
     });
   } else {
     try {
-      (new Api()).register(values);
+      (new Api()).register(values, onSuccess, onError);
     } catch (err) {
-      try {
-        const error = JSON.parse(err.message);
-        const message = document.getElementById(error.type + '-error');
-        message.classList.add('active');
-        message.textContent = error.message;
-      } catch (e) {
-        console.log(e);
-      }
+      console.log(err);
     }
   }
 }

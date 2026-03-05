@@ -15,8 +15,8 @@ export class EventsService {
     return this.repository.create(dto);
   }
 
-  findAll() {
-    return this.repository.findAll();
+  findAll(userId: string) {
+    return this.repository.findAll(userId);
   }
 
   findOne(id: number) {

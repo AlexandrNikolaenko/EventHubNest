@@ -22,8 +22,8 @@ export class ApiEventsController {
   }
 
   @Get()
-  findAll() {
-    return this.eventsService.findAll();
+  findAll(@Param('userId') userId: string) {
+    return this.eventsService.findAll(userId);
   }
 
   @Get(':id')
