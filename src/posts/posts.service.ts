@@ -3,48 +3,87 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PostsRepository } from './entities/posts.repository';
+import { interval, Subject } from 'rxjs';
+import { MessageEvent } from '@nestjs/common';
 
 @Injectable()
 export class PostsService {
   private repository: PostsRepository;
+  private eventSubject = new Subject<MessageEvent>();
+  public events$ = this.eventSubject.asObservable();
+  private lastCount = 0;
   constructor(private prisma: PrismaService) {
     this.repository = new PostsRepository(prisma);
   }
 
-  create(dto: CreatePostDto) {
-    return;
-    return this.prisma.post.create({
+  onModuleInit() {
+    interval(5000).subscribe(async () => {
+      const count = await this.prisma.post.count();
+      if (count !== this.lastCount) {
+        this.lastCount = count;
+        this.eventSubject.next({
+          data: { type: 'posts_changed' }
+        });
+      }
+    });
+  }
+
+  emitPostUpdate(post: unknown) {
+    this.eventSubject.next({
       data: {
-        title: dto.title,
-        desc: dto.desc,
-        date: dto.date,
-        place: dto.place,
-        authorId: dto.authorId,
-        image: dto.image,
+        type: 'post_update',
+        post,
       },
     });
   }
 
+  async create(dto: CreatePostDto) {
+    const post = await this.repository.create(dto);
+
+    this.emitPostUpdate(post);
+    return post;
+    // return this.prisma.post.create({
+    //   data: {
+    //     title: dto.title,
+    //     desc: dto.desc,
+    //     date: dto.date,
+    //     place: dto.place,
+    //     authorId: dto.authorId,
+    //     image: dto.image,
+    //   },
+    // });
+  }
+
   async findAll() {
-    return await this.repository.findAll();
+    return this.repository.findAll();
   }
 
   async findOne(id: number) {
-    return await this.repository.findOne(id);
+    return this.repository.findOne(id);
   }
 
   async update(id: number, dto: UpdatePostDto) {
-    return;
-    return this.prisma.post.update({
-      where: { id },
-      data: dto,
-    });
+    const post = await this.repository.update(id, dto);
+
+    this.emitPostUpdate(post);
+    return post;
+    // return this.prisma.post.update({
+    //   where: { id },
+    //   data: dto,
+    // });
   }
 
   async remove(id: number) {
-    return;
-    return this.prisma.post.delete({
-      where: { id },
+    await this.repository.remove(id);
+    this.eventSubject.next({
+      data: {
+        type: 'post_deleted',
+        id,
+      },
     });
+    return;
+    // return this.prisma.post.delete({
+    //   where: { id },
+    // });
   }
 }
