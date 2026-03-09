@@ -12,34 +12,64 @@ export class PostsService {
   private eventSubject = new Subject<MessageEvent>();
   public events$ = this.eventSubject.asObservable();
   private lastCount = 0;
+  private lastUpdatedAt: Date | null = null;
   constructor(private prisma: PrismaService) {
     this.repository = new PostsRepository(prisma);
     void this.init();
   }
 
   private async init() {
-    this.lastCount = await this.prisma.post.count();
+    const [count, latest] = await Promise.all([
+      this.prisma.post.count(),
+      this.prisma.post.findFirst({
+        orderBy: { updatedAt: 'desc' },
+        select: { updatedAt: true },
+      }),
+    ]);
+
+    this.lastCount = count;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    this.lastUpdatedAt = latest?.updatedAt ?? null;
 
     interval(5000).subscribe(() => {
-      void this.checkPostsCount();
+      void this.checkPosts();
     });
   }
 
-  private async checkPostsCount(): Promise<void> {
-    const count = await this.prisma.post.count();
+  private async checkPosts(): Promise<void> {
+    const [count, latest] = await Promise.all([
+      this.prisma.post.count(),
+      this.prisma.post.findFirst({
+        orderBy: { updatedAt: 'desc' },
+        select: { updatedAt: true },
+      }),
+    ]);
 
-    if (count !== this.lastCount) {
-      if (this.lastCount < count) {
-        this.eventSubject.next({
-          data: { type: 'post_created' },
-        });
-      } else {
-        this.eventSubject.next({
-          data: { type: 'post_deleted' },
-        });
-      }
-      this.lastCount = count;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const updatedAt = latest?.updatedAt ?? null;
+
+    if (count > this.lastCount) {
+      this.eventSubject.next({
+        data: { type: 'post_created' },
+      });
+    } else if (count < this.lastCount) {
+      this.eventSubject.next({
+        data: { type: 'post_deleted' },
+      });
+    } else if (
+      updatedAt &&
+      this.lastUpdatedAt &&
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      updatedAt.getTime() !== this.lastUpdatedAt.getTime()
+    ) {
+      this.eventSubject.next({
+        data: { type: 'post_updated' },
+      });
     }
+
+    this.lastCount = count;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    this.lastUpdatedAt = updatedAt;
   }
 
   emitPostUpdate(post: unknown) {
