@@ -12,7 +12,6 @@ main {
 }
 
 .img-container {
-  width: 100%;
   aspect-ratio: 400/200;
   border-radius: 10px;
   overflow: hidden;

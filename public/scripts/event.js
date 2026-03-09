@@ -1,27 +1,37 @@
 import { store } from './api.js';
+import Api from './http-api.js';
 
-const eventId = Number(document.location.search.split('=')[1]);
+const eventId = Number(document.location.pathname.split('/')[2]);
+console.log(document.location.pathname.split('/')[1])
 
-const event = store.getEventById(eventId);
+
+const api = new Api();
 
 function loadEvent() {
-  const section = document.querySelector('.info-section');
+  api.getEvent(eventId, handleSuccess, handleError);
 
-  section.querySelector('.title').textContent = event.title;
-  section.querySelector('.desc').textContent = event.desc;
-  section.querySelector('.date').textContent = event.date;
-  section.querySelector('.place').textContent = event.place;
-  section.querySelector('.author').textContent = event.author;
+  function handleError(e) {
+    console.log(e);
+  }
 
-  const usersList = document.getElementById('users-list');
-  usersList.innerHTML = '';
-  const userTemplate = document.getElementById('user-template').content;
-  event.users.forEach((elem) => {
-    const user = userTemplate.querySelector('li').cloneNode(true);
-    user.textContent = elem;
-    console.log(user);
-    usersList.appendChild(user);
-  });
+  function handleSuccess(event) {
+    const section = document.querySelector('.info-section');
+  
+    section.querySelector('.title').textContent = event.title;
+    section.querySelector('.desc').textContent = event.desc;
+    section.querySelector('.date').textContent = (new Date(event.date)).toLocaleDateString('ru-RU');
+    section.querySelector('.place').textContent = event.place;
+    section.querySelector('.author').textContent = event.author.email;
+  
+    const usersList = document.getElementById('users-list');
+    usersList.innerHTML = '';
+    const userTemplate = document.getElementById('user-template').content;
+    event.registrations.forEach((elem) => {
+      const user = userTemplate.querySelector('li').cloneNode(true);
+      user.textContent = elem.user.email;
+      usersList.appendChild(user);
+    });
+  }
 }
 
 loadEvent();
@@ -34,13 +44,15 @@ document
 
 function handleOpenEditModal(e) {
   e.preventDefault();
-  const form = document.getElementById('edit-event-form');
+  console.log(e);
+  document.location.assign('/events/' + eventId + '/edit');
+  // const form = document.getElementById('edit-event-form');
 
-  form.querySelector('#edit-title').value = event.title;
-  form.querySelector('#edit-desc').value = event.desc;
-  form.querySelector('#edit-date').value = event.date;
-  form.querySelector('#edit-place').value = event.place;
-  document.getElementById('edit-event-modal').classList.add('active');
+  // form.querySelector('#edit-title').value = event.title;
+  // form.querySelector('#edit-desc').value = event.desc;
+  // form.querySelector('#edit-date').value = event.date;
+  // form.querySelector('#edit-place').value = event.place;
+  // document.getElementById('edit-event-modal').classList.add('active');
 }
 
 function handleCloseEditModal(e) {

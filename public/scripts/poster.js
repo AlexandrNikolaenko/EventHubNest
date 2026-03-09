@@ -11,6 +11,33 @@ function loadPoster(search = '') {
   });
 }
 
+const eventSource = new EventSource('/api/posts/events');
+
+eventSource.onmessage = function (event) {
+  const data = JSON.parse(event.data);
+  console.log(data);
+
+  switch (data.type) {
+    case 'post_created':
+      toastr.success("Post created");
+      loadPoster();
+      break;
+
+    case 'post_update':
+      toastr.info("Post updated");
+      loadPoster();
+      break;
+
+    case 'post_deleted':
+      toastr.warning("Post deleted");
+      loadPoster();
+      break;
+
+    default:
+      loadPoster();
+  }
+};
+
 function handleSuccess(data) {
   list.innerHTML = '';
 
@@ -43,10 +70,8 @@ function handleError(e) {
 // console.log(await loadPoster());
 
 function load(title) {
-  console.log(title);
   loadPoster(title ? '?title=' + encodeURI(title) : '')
     .then((data) => {
-      console.log(data);
       handleSuccess(data);
     })
     .catch(handleError);

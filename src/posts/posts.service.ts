@@ -12,20 +12,35 @@ export class PostsService {
   private eventSubject = new Subject<MessageEvent>();
   public events$ = this.eventSubject.asObservable();
   private lastCount = 0;
+  private lastUpdatedAt: Date | null = null;
   constructor(private prisma: PrismaService) {
     this.repository = new PostsRepository(prisma);
+    void this.init();
   }
 
-  onModuleInit() {
-    interval(5000).subscribe(async () => {
-      const count = await this.prisma.post.count();
-      if (count !== this.lastCount) {
-        this.lastCount = count;
+  private async init() {
+    this.lastCount = await this.prisma.post.count();
+
+    interval(5000).subscribe(() => {
+      void this.checkPostsCount();
+    });
+  }
+
+  private async checkPostsCount(): Promise<void> {
+    const count = await this.prisma.post.count();
+
+    if (count !== this.lastCount) {
+      if (this.lastCount < count) {
         this.eventSubject.next({
-          data: { type: 'posts_changed' }
+          data: { type: 'post_created' },
+        });
+      } else {
+        this.eventSubject.next({
+          data: { type: 'post_deleted' },
         });
       }
-    });
+      this.lastCount = count;
+    }
   }
 
   emitPostUpdate(post: unknown) {

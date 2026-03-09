@@ -103,7 +103,7 @@ function loadEvents(search) {
         eventRow.querySelector('.cell-id').textContent = event.id;
         eventRow.querySelector('.cell-title').textContent = event.title;
         eventRow.querySelector('.cell-desc').textContent = event.desc;
-        eventRow.querySelector('.cell-author').textContent = event.author;
+        eventRow.querySelector('.cell-author').textContent = event.author.email;
         eventRow.querySelector('.cell-date').textContent = (new Date(event.date)).toLocaleDateString('ru-RU');
         eventRow.querySelector('.cell-place').textContent = event.place;
         tableBody.appendChild(eventRow);

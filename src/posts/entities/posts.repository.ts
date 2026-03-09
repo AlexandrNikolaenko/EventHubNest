@@ -1,15 +1,15 @@
 import { PrismaService } from 'src/prisma/prisma.service';
-// import { CreatePostDto } from '../dto/create-post.dto';
-// import { UpdatePostDto } from '../dto/update-post.dto';
+import { CreatePostDto } from '../dto/create-post.dto';
+import { UpdatePostDto } from '../dto/update-post.dto';
 
 export class PostsRepository {
   constructor(private prisma: PrismaService) {}
 
-  // async create(data: CreatePostDto) {
-  //   return await this.prisma.post.create({
-  //     data,
-  //   });
-  // }
+  async create(data: CreatePostDto) {
+    return await this.prisma.post.create({
+      data,
+    });
+  }
 
   async findAll() {
     return await this.prisma.post.findMany();
@@ -21,16 +21,16 @@ export class PostsRepository {
     });
   }
 
-  // async update(id: number, data: UpdatePostDto) {
-  //   return await this.prisma.post.update({
-  //     where: { id },
-  //     data,
-  //   });
-  // }
+  async update(id: number, data: UpdatePostDto) {
+    return await this.prisma.post.update({
+      where: { id },
+      data,
+    });
+  }
 
-  // async remove(id: number) {
-  //   return await this.prisma.post.delete({
-  //     where: { id },
-  //   });
-  // }
+  async remove(id: number) {
+    return await this.prisma.post.delete({
+      where: { id },
+    });
+  }
 }
