@@ -86,7 +86,7 @@ function loadEvents(search) {
         eventCard.querySelector('.card-header').textContent = event.title;
         eventCard.querySelector('.event-author').textContent = event.author.email;
         eventCard.querySelector('.event-description').textContent = event.desc;
-        eventCard.querySelector('.event-date').textContent = event.date;
+        eventCard.querySelector('.event-date').textContent = (new Date(event.date)).toLocaleDateString('ru-RU');
         eventCard.querySelector('.event-place').textContent = event.place;
         const link = eventCard.querySelector('.event-button');
         link.setAttribute('href', `/events/${event.id}`);
@@ -104,7 +104,7 @@ function loadEvents(search) {
         eventRow.querySelector('.cell-title').textContent = event.title;
         eventRow.querySelector('.cell-desc').textContent = event.desc;
         eventRow.querySelector('.cell-author').textContent = event.author;
-        eventRow.querySelector('.cell-date').textContent = event.date;
+        eventRow.querySelector('.cell-date').textContent = (new Date(event.date)).toLocaleDateString('ru-RU');
         eventRow.querySelector('.cell-place').textContent = event.place;
         tableBody.appendChild(eventRow);
       });
@@ -173,15 +173,16 @@ document
 
 function handleOpenEditModal(e, id) {
   e.preventDefault();
-  const form = document.getElementById('edit-event-form');
-  const event = store.getEventById(id);
-  form.dataset.id = id;
-  console.log(e.target);
-  form.querySelector('#edit-title').value = event.title;
-  form.querySelector('#edit-desc').value = event.desc;
-  form.querySelector('#edit-date').value = event.date;
-  form.querySelector('#edit-place').value = event.place;
-  document.getElementById('edit-event-modal').classList.add('active');
+  document.location.assign('/events/' + id + '/edit');
+  // const form = document.getElementById('edit-event-form');
+  // const event = store.getEventById(id);
+  // form.dataset.id = id;
+  // console.log(e.target);
+  // form.querySelector('#edit-title').value = event.title;
+  // form.querySelector('#edit-desc').value = event.desc;
+  // form.querySelector('#edit-date').value = event.date;
+  // form.querySelector('#edit-place').value = event.place;
+  // document.getElementById('edit-event-modal').classList.add('active');
 }
 
 function handleCloseEditModal(e) {

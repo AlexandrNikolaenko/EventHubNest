@@ -64,7 +64,7 @@ class HttpRequest {
         headers: {
           "Content-Type": "application/json",
         },
-        body: body,
+        body: JSON.stringify(body),
       });
       if (res.ok) {
         const data = await res.json();
@@ -90,7 +90,7 @@ class HttpRequest {
         headers: {
           "Content-Type": "application/json",
         },
-        body: body,
+        body: JSON.stringify(body),
       });
       if (res.ok) {
         const data = await res.json();
@@ -145,6 +145,15 @@ export default class Api {
       query: '/users/search?email=' + email,
       onSuccess,
       onError,
+    })
+  }
+
+  async editEvent(onSuccess, onError, body, id) {
+    return await this.#httpRequest.patch({
+      query: '/events/' + id,
+      onSuccess,
+      onError,
+      body
     })
   }
 

@@ -6,93 +6,38 @@ const api = new Api();
 
 // открытие и закрытие формы редактирования события
 
-function handleOpenEditModal(e, id) {
-  e.preventDefault();
-  const form = document.getElementById('edit-event-form');
-  const event = store.getEventById(id);
-  form.dataset.id = id;
-  console.log(e.target);
-  form.querySelector('#edit-title').value = event.title;
-  form.querySelector('#edit-desc').value = event.desc;
-  form.querySelector('#edit-date').value = event.date;
-  form.querySelector('#edit-place').value = event.place;
-  document.getElementById('edit-event-modal').classList.add('active');
+function handleOpenEditModal(id) {
+  // const event = store.getEventById(id);
+  function handleSuccess(event) {
+    const form = document.getElementById('edit-event-form');
+    form.dataset.id = id;
+    form.querySelector('#edit-title').value = event.title;
+    form.querySelector('#edit-desc').value = event.desc;
+    form.querySelector('#edit-date').value = (new Date(event.date)).toLocaleDateString('ru-RU');
+    form.querySelector('#edit-place').value = event.place;
+    document.getElementById('edit-event-modal').classList.add('active');
+  }
+
+  function handleError(e) {
+    console.log(e);
+  }
+
+  api.getEvent(id, handleSuccess, handleError);
 }
+
+const eventId = Number(document.location.pathname.split('/')[2])
+
+handleOpenEditModal(eventId)
 
 function handleCloseEditModal(e) {
   e.preventDefault();
   document.getElementById('edit-event-modal').classList.remove('active');
+  document.location.assign('/events')
 }
 
 document
   .getElementById('close-edit-modal')
   .addEventListener('click', handleCloseEditModal);
-
-// обработка формы создания события
-
-let users = [];
-
-// выбор пользователей
-
-function handleAddUser(e, email) {
-  e.preventDefault();
-
-  const activeUsersList = document.getElementById('users-active-list');
-
-  const activeUserTemplate = document.getElementById(
-    'active-user-template',
-  ).content;
-
-  const activeUser = activeUserTemplate.querySelector('li').cloneNode(true);
-  activeUser.querySelector('span').textContent = email;
-  activeUser.querySelector('button').addEventListener('click', (e) => {
-    e.preventDefault();
-    activeUsersList.removeChild(activeUser);
-    users = users.filter((elem) => elem != email);
-  });
-  if (!Array.from(activeUsersList.childNodes).includes(activeUser)) {
-    activeUsersList.appendChild(activeUser);
-    users.push(email);
-  }
-  console.log(users);
-}
-
-function setUsers(search) {
-  const usersList = document.getElementById('users-list');
-  usersList.innerHTML = '';
-  let newUsers;
-  if (search)
-    newUsers = store.users
-      .filter((elem) => elem.email.includes(search))
-      .map((elem) => elem.email);
-  else newUsers = store.users.map((elem) => elem.email);
-
-  const userTemplate = document.getElementById('user-template').content;
-
-  newUsers.forEach((email) => {
-    const userBlock = userTemplate.cloneNode(true);
-    userBlock.querySelector('button').textContent = email;
-    userBlock
-      .querySelector('button')
-      .addEventListener('click', (e) => handleAddUser(e, email));
-    usersList.appendChild(userBlock);
-  });
-}
-
-function handleChangeUsersInput(e) {
-  const usersList = document.getElementById('users-list');
-  if (e.target.value != '') {
-    usersList.classList.remove('hide');
-    setUsers();
-  } else {
-    usersList.classList.add('hide');
-    usersList.innerHTML == '';
-  }
-}
-
-document
-  .getElementById('users')
-  .addEventListener('input', handleChangeUsersInput);
 
 // обработка формы редактирования события
 
@@ -125,11 +70,24 @@ function validateFormEdit(event) {
 function handleEditEvent(e) {
   e.preventDefault();
   const event = Object.fromEntries(new FormData(e.target));
-  if (validateFormEdit(event)) {
-    store.editEvent(e.target.dataset.id, event);
+
+  function handleSuccess() {
     e.target.reset();
     document.getElementById('edit-event-modal').classList.remove('active');
-    loadEvents();
+    document.location.assign('/events');
+  }
+
+  function handleError(e) {
+    console.log(e);
+  }
+
+  if (validateFormEdit(event)) {
+    const body = {
+      authorId: Number(user.getUser().id),
+      dto: event
+    }
+    api.editEvent(handleSuccess, handleError, body, eventId);
+    // store.editEvent(e.target.dataset.id, event);
   }
 }
 
