@@ -10,7 +10,7 @@ export class EventsRepository {
     const users = await this.prisma.user.findMany({
       where: {
         email: {
-          in: dto.participants,
+          in: dto.users,
         },
       },
       select: {
@@ -24,8 +24,17 @@ export class EventsRepository {
         desc: dto.desc,
         place: dto.place,
         date: new Date(dto.date),
-        categoryId: dto.categoryId,
-        authorId,
+        author: {
+          connect: {
+            id: Number(authorId),
+          },
+        },
+        category: {
+          connect: {
+            id: 2,
+            // id: Number(dto.categoryId),
+          },
+        },
 
         registrations: {
           create: users.map((user) => ({
@@ -121,7 +130,7 @@ export class EventsRepository {
     const users = await this.prisma.user.findMany({
       where: {
         email: {
-          in: dto.participants,
+          in: dto.users,
         },
       },
     });

@@ -24,5 +24,5 @@ export class CreateEventDto {
 
   @IsArray()
   @IsEmail({}, { each: true })
-  participants: string[];
+  users: string[];
 }

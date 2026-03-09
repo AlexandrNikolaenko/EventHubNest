@@ -140,6 +140,31 @@ export default class Api {
     this.#httpRequest = new HttpRequest();
   }
 
+  async searchUsers(onSuccess, onError, email) {
+    return await this.#httpRequest.get({
+      query: '/users/search?email=' + email,
+      onSuccess,
+      onError,
+    })
+  }
+
+  async deleteEvent(onSuccess, onError, id) {
+    return await this.#httpRequest.delete({
+      query: '/events/' + id,
+      onSuccess,
+      onError
+    })
+  }
+
+  async createEvents(onSuccess, onError, body) {
+    return await this.#httpRequest.post({
+      query: '/events',
+      onSuccess,
+      onError,
+      body
+    })
+  }
+
   async getEvents(onSuccess, onError, userId) {
     return await this.#httpRequest.get({
       query: '/events' + (userId ? `?userId=${userId}` : ''),

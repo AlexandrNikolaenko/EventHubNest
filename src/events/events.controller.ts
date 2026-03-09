@@ -19,8 +19,10 @@ export class ApiEventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Post()
-  create(@Body() { authorId, dto }: { authorId: number; dto: CreateEventDto }) {
-    return this.eventsService.create(authorId, dto);
+  create(
+    @Body() { authorId, data }: { authorId: number; data: CreateEventDto },
+  ) {
+    return this.eventsService.create(authorId, data);
   }
 
   @Get()
@@ -68,6 +70,22 @@ export class EventsController {
     };
   }
 
+  @Get('add')
+  @Render('create-events')
+  add() {
+    return {
+      extraHead: `<link rel="stylesheet" href="/styles/main.css" />
+    <script type="module" src="/scripts/api.js"></script>`,
+      pageModuleScripts: ['add-event.js'],
+      pageTemplates: [
+        { name: 'templates/user' },
+        { name: 'templates/active-user' },
+        { name: 'templates/event-card' },
+        { name: 'templates/event-table-row' },
+      ],
+    };
+  }
+
   @Get(':id')
   @Render('event')
   event() {
@@ -79,30 +97,14 @@ export class EventsController {
     };
   }
 
-  @Get('add')
-  @Render('create-event')
-  add() {
-    return {
-      extraHead: `<link rel="stylesheet" href="/styles/main.css" />
-    <script type="module" src="/scripts/api.js"></script>`,
-      pageModuleScripts: ['main.js'],
-      pageTemplates: [
-        { name: 'templates/user' },
-        { name: 'templates/active-user' },
-        { name: 'templates/event-card' },
-        { name: 'templates/event-table-row' },
-      ],
-    };
-  }
-
-  @Get('edit/:id')
+  @Get(':id/edit')
   @Render('edit-event')
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   edit(@Param('id') id: string) {
     return {
       extraHead: `<link rel="stylesheet" href="/styles/main.css" />
     <script type="module" src="/scripts/api.js"></script>`,
-      pageModuleScripts: ['main.js'],
+      pageModuleScripts: ['edit-event.js'],
       pageTemplates: [
         { name: 'templates/user' },
         { name: 'templates/active-user' },

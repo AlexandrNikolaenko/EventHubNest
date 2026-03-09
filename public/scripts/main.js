@@ -28,8 +28,17 @@ document
 
 function handleRemoveEvent(e, id) {
   e.preventDefault();
-  store.deleteEvents(id);
-  loadEvents();
+  // store.deleteEvents(id);
+
+  function handleSuccess() {
+    loadEvents();
+  }
+
+  function hanldeError(e) {
+    console.log(e)
+  }
+
+  api.deleteEvent(handleSuccess, hanldeError, id);
 }
 
 function loadEvents(search) {
@@ -75,12 +84,12 @@ function loadEvents(search) {
         eventCard.querySelector('.card-media').style.background =
           `url(${event.image || '/images/theatre.jpg'})`;
         eventCard.querySelector('.card-header').textContent = event.title;
-        eventCard.querySelector('.event-author').textContent = event.author;
+        eventCard.querySelector('.event-author').textContent = event.author.email;
         eventCard.querySelector('.event-description').textContent = event.desc;
         eventCard.querySelector('.event-date').textContent = event.date;
         eventCard.querySelector('.event-place').textContent = event.place;
         const link = eventCard.querySelector('.event-button');
-        link.setAttribute('href', `/poster/event?id=${event.id}`);
+        link.setAttribute('href', `/events/${event.id}`);
         eventCard
           .querySelector('.remove-button')
           .addEventListener('click', (e) => handleRemoveEvent(e, event.id));
@@ -123,12 +132,15 @@ document.getElementById('search-form').addEventListener('submit', handleSearch);
 
 function handleOpenCreatorModal(e) {
   e.preventDefault();
-  document.getElementById('create-event-modal').classList.add('active');
+  // document.getElementById('create-event-modal').classList.add('active');
+  document.location.assign('/events/add');
 }
 
 function handleCloseCreatorModal(e) {
   e.preventDefault();
-  document.getElementById('create-event-modal').classList.remove('active');
+  // document.getElementById('create-event-modal').classList.remove('active');
+  console.log('close');
+  document.location.assign('/events');
 }
 
 document
