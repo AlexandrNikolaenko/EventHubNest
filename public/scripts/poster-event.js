@@ -5,7 +5,7 @@ const eventId = Number(document.location.pathname.split('/')[2]);
 function loadEvent() {
   return new Promise((resolve, reject) => {
     const api = new Api();
-    api.getEvent(eventId, resolve, reject);
+    api.getPost(eventId, resolve, reject);
   });
 }
 

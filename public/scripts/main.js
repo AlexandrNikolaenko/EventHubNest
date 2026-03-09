@@ -1,6 +1,8 @@
 import { store, user } from './api.js';
+import Api from './http-api.js';
 
 if (!user.getUser().id) window.location.assign('/auth/login');
+const api = new Api();
 
 function handleChangeVision(param) {
   if (param == 'list') {
@@ -31,62 +33,77 @@ function handleRemoveEvent(e, id) {
 }
 
 function loadEvents(search) {
-  let events = store.getEvents();
+  // let events = store.getEvents();
+  api.getEvents(handleSuccess, handleError, user.getUser().id);
 
-  if (search) {
-    events = events.filter((event) => event.title.includes(search));
+  function handleError(e) {
+    const error = document.getElementById('query-error');
+    let message = ':(';
+    error.classList.remove('hide');
+    switch (e.message) {
+      case '500':
+        message = 'Сервер не отвечает' + message;
+      case '429':
+        message = 'К сожалению, вы были заблокированы' + message;
+    }
   }
 
-  const list = document.getElementById('events-list');
-  const tableBody = document.getElementById('events-table-body');
-  const table = document.getElementById('events-table');
-  list.innerHTML = '';
-  tableBody.innerHTML = '';
+  function handleSuccess(events) {
+    if (search) {
+      events = events.filter((event) => event.title.includes(search));
+    }
 
-  if (events.length != 0) {
-    document.getElementById('events__empty').classList.add('hide');
-    list.classList.remove('hide');
-    const eventTemplate = document.getElementById(
-      'event-card-template',
-    ).content;
-    const eventRowTemplate = document.getElementById(
-      'event-table-row-template',
-    ).content;
+    const list = document.getElementById('events-list');
+    const tableBody = document.getElementById('events-table-body');
+    const table = document.getElementById('events-table');
+    list.innerHTML = '';
+    tableBody.innerHTML = '';
 
-    events.forEach((event) => {
-      // добавляем списко карточек
-      const eventCard = eventTemplate.cloneNode(true);
-      eventCard.querySelector('.card-media').style.background =
-        `url(${event.image || '/images/theatre.jpg'})`;
-      eventCard.querySelector('.card-header').textContent = event.title;
-      eventCard.querySelector('.event-author').textContent = event.author;
-      eventCard.querySelector('.event-description').textContent = event.desc;
-      eventCard.querySelector('.event-date').textContent = event.date;
-      eventCard.querySelector('.event-place').textContent = event.place;
-      const link = eventCard.querySelector('.event-button');
-      link.setAttribute('href', `/poster/event?id=${event.id}`);
-      eventCard
-        .querySelector('.remove-button')
-        .addEventListener('click', (e) => handleRemoveEvent(e, event.id));
-      eventCard
-        .querySelector('.edit-event-button')
-        .addEventListener('click', (e) => handleOpenEditModal(e, event.id));
-      list.appendChild(eventCard);
+    if (events.length != 0) {
+      document.getElementById('events__empty').classList.add('hide');
+      list.classList.remove('hide');
+      const eventTemplate = document.getElementById(
+        'event-card-template',
+      ).content;
+      const eventRowTemplate = document.getElementById(
+        'event-table-row-template',
+      ).content;
 
-      // добавляем таблицу событий
-      const eventRow = eventRowTemplate.cloneNode(true);
-      eventRow.querySelector('.cell-id').textContent = event.id;
-      eventRow.querySelector('.cell-title').textContent = event.title;
-      eventRow.querySelector('.cell-desc').textContent = event.desc;
-      eventRow.querySelector('.cell-author').textContent = event.author;
-      eventRow.querySelector('.cell-date').textContent = event.date;
-      eventRow.querySelector('.cell-place').textContent = event.place;
-      tableBody.appendChild(eventRow);
-    });
-  } else {
-    list.classList.add('hide');
-    table.classList.add('hide');
-    document.getElementById('events__empty').classList.remove('hide');
+      events.forEach((event) => {
+        // добавляем списко карточек
+        const eventCard = eventTemplate.cloneNode(true);
+        eventCard.querySelector('.card-media').style.background =
+          `url(${event.image || '/images/theatre.jpg'})`;
+        eventCard.querySelector('.card-header').textContent = event.title;
+        eventCard.querySelector('.event-author').textContent = event.author;
+        eventCard.querySelector('.event-description').textContent = event.desc;
+        eventCard.querySelector('.event-date').textContent = event.date;
+        eventCard.querySelector('.event-place').textContent = event.place;
+        const link = eventCard.querySelector('.event-button');
+        link.setAttribute('href', `/poster/event?id=${event.id}`);
+        eventCard
+          .querySelector('.remove-button')
+          .addEventListener('click', (e) => handleRemoveEvent(e, event.id));
+        eventCard
+          .querySelector('.edit-event-button')
+          .addEventListener('click', (e) => handleOpenEditModal(e, event.id));
+        list.appendChild(eventCard);
+
+        // добавляем таблицу событий
+        const eventRow = eventRowTemplate.cloneNode(true);
+        eventRow.querySelector('.cell-id').textContent = event.id;
+        eventRow.querySelector('.cell-title').textContent = event.title;
+        eventRow.querySelector('.cell-desc').textContent = event.desc;
+        eventRow.querySelector('.cell-author').textContent = event.author;
+        eventRow.querySelector('.cell-date').textContent = event.date;
+        eventRow.querySelector('.cell-place').textContent = event.place;
+        tableBody.appendChild(eventRow);
+      });
+    } else {
+      list.classList.add('hide');
+      table.classList.add('hide');
+      document.getElementById('events__empty').classList.remove('hide');
+    }
   }
 }
 

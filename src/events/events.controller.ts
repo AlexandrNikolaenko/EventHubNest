@@ -7,6 +7,8 @@ import {
   Patch,
   Delete,
   Render,
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -22,8 +24,9 @@ export class ApiEventsController {
   }
 
   @Get()
-  findAll(@Param('userId') userId: string) {
-    return this.eventsService.findAll(Number(userId));
+  findAll(@Query('userId', ParseIntPipe) userId: number) {
+    console.log('userId', userId);
+    return this.eventsService.findAll(userId);
   }
 
   @Get(':id')
@@ -73,6 +76,39 @@ export class EventsController {
     <script type="module" src="/scripts/api.js"></script>`,
       pageModuleScripts: ['event.js'],
       pageTemplates: [{ name: 'templates/user' }],
+    };
+  }
+
+  @Get('add')
+  @Render('create-event')
+  add() {
+    return {
+      extraHead: `<link rel="stylesheet" href="/styles/main.css" />
+    <script type="module" src="/scripts/api.js"></script>`,
+      pageModuleScripts: ['main.js'],
+      pageTemplates: [
+        { name: 'templates/user' },
+        { name: 'templates/active-user' },
+        { name: 'templates/event-card' },
+        { name: 'templates/event-table-row' },
+      ],
+    };
+  }
+
+  @Get('edit/:id')
+  @Render('edit-event')
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  edit(@Param('id') id: string) {
+    return {
+      extraHead: `<link rel="stylesheet" href="/styles/main.css" />
+    <script type="module" src="/scripts/api.js"></script>`,
+      pageModuleScripts: ['main.js'],
+      pageTemplates: [
+        { name: 'templates/user' },
+        { name: 'templates/active-user' },
+        { name: 'templates/event-card' },
+        { name: 'templates/event-table-row' },
+      ],
     };
   }
 }

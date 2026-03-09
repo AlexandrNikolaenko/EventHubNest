@@ -33,8 +33,8 @@ model Registration {
   id      Int   @id @default(autoincrement())
   userId  Int
   eventId Int
-  event   Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event   Event @relation(fields: [eventId], references: [id])
+  user    User  @relation(fields: [userId], references: [id])
 
   @@unique([userId, eventId])
 }
@@ -43,11 +43,11 @@ model Post {
   id         Int       @id @default(autoincrement())
   title      String
   desc       String
-  image      String
   date       DateTime
   place      String
   authorId   Int
   categoryId Int?
+  image      String
   author     User      @relation(fields: [authorId], references: [id])
   category   Category? @relation(fields: [categoryId], references: [id])
 }

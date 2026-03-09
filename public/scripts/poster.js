@@ -7,7 +7,7 @@ const postTemplate = document.getElementById('post-template').content;
 function loadPoster(search = '') {
   return new Promise((resolve, reject) => {
     const api = new Api();
-    api.getEvents(resolve, reject, search);
+    api.getPosts(resolve, reject, search);
   });
 }
 

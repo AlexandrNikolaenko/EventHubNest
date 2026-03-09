@@ -140,7 +140,23 @@ export default class Api {
     this.#httpRequest = new HttpRequest();
   }
 
-  async getEvents(onSuccess, onError, query = '') {
+  async getEvents(onSuccess, onError, userId) {
+    return await this.#httpRequest.get({
+      query: '/events' + (userId ? `?userId=${userId}` : ''),
+      onSuccess,
+      onError,
+    });
+  }
+
+  async getEvent(id, onSuccess, onError) {
+    return await this.#httpRequest.get({
+      query: '/events/' + id,
+      onSuccess,
+      onError,
+    });
+  }
+
+  async getPosts(onSuccess, onError, query = '') {
     return await this.#httpRequest.get({
       query: '/posts' + query,
       onSuccess,
@@ -148,7 +164,7 @@ export default class Api {
     });
   }
 
-  async getEvent(id, onSuccess, onError) {
+  async getPost(id, onSuccess, onError) {
     return await this.#httpRequest.get({
       query: '/posts/' + id,
       onSuccess,
