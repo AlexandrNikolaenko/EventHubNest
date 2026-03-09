@@ -24,6 +24,8 @@ model Event {
   place         String
   authorId      Int
   categoryId    Int
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
   author        User           @relation("EventAuthor", fields: [authorId], references: [id])
   category      Category       @relation(fields: [categoryId], references: [id])
   registrations Registration[]

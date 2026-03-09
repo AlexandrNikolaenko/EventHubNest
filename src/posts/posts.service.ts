@@ -12,7 +12,6 @@ export class PostsService {
   private eventSubject = new Subject<MessageEvent>();
   public events$ = this.eventSubject.asObservable();
   private lastCount = 0;
-  private lastUpdatedAt: Date | null = null;
   constructor(private prisma: PrismaService) {
     this.repository = new PostsRepository(prisma);
     void this.init();
