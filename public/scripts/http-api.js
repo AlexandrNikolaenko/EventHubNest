@@ -2,7 +2,7 @@ class HttpRequest {
   #api_host;
 
   constructor() {
-    this.#api_host = 'http://localhost:3000/api';
+    this.#api_host = 'https://eventhubnest.onrender.com/api';
   }
 
   async get({ onError, onSuccess, query }) {
