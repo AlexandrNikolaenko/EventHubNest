@@ -20,7 +20,7 @@ function handleSuccess(data) {
     'background-image: url(' + data.image + ')';
   post.querySelector('h6').textContent = data.title;
   post.querySelector('p').textContent = data.desc;
-  post.querySelector('.date').textContent = data.date;
+  post.querySelector('.date').textContent = (new Date(elem.date)).toLocaleDateString('ru-RU');
   post.querySelector('.place').textContent = data.place;
 
   section.appendChild(post);

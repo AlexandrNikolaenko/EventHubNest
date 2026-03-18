@@ -47,7 +47,7 @@ function handleSuccess(data) {
       'background-image: url(' + elem.image + ')';
     post.querySelector('h6').textContent = elem.title;
     post.querySelector('p').textContent = elem.desc;
-    post.querySelector('.date').textContent = elem.date;
+    post.querySelector('.date').textContent = (new Date(elem.date)).toLocaleDateString('ru-RU');
     post.querySelector('.place').textContent = elem.place;
     post.querySelector('a').setAttribute('href', '/posts/' + elem.id);
 
