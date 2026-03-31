@@ -2,8 +2,7 @@ import { store } from './api.js';
 import Api from './http-api.js';
 
 const eventId = Number(document.location.pathname.split('/')[2]);
-console.log(document.location.pathname.split('/')[1])
-
+console.log(document.location.pathname.split('/')[1]);
 
 const api = new Api();
 
@@ -16,13 +15,15 @@ function loadEvent() {
 
   function handleSuccess(event) {
     const section = document.querySelector('.info-section');
-  
+
     section.querySelector('.title').textContent = event.title;
     section.querySelector('.desc').textContent = event.desc;
-    section.querySelector('.date').textContent = (new Date(event.date)).toLocaleDateString('ru-RU');
+    section.querySelector('.date').textContent = new Date(
+      event.date,
+    ).toLocaleDateString('ru-RU');
     section.querySelector('.place').textContent = event.place;
     section.querySelector('.author').textContent = event.author.email;
-  
+
     const usersList = document.getElementById('users-list');
     usersList.innerHTML = '';
     const userTemplate = document.getElementById('user-template').content;

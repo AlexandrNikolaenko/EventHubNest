@@ -9,9 +9,12 @@ const page = document.location.pathname;
 Array.from(links).forEach((link) => {
   if (
     (page == '/' && link.getAttribute('href') == '/') ||
-    ((page == '/events/' || page == '/events') && link.getAttribute('href') == '/events') ||
-    ((page == '/about/' || page == '/about') && link.getAttribute('href') == '/about') ||
-    ((page == '/posts/' || page == '/posts') && link.getAttribute('href') == '/posts')
+    ((page == '/events/' || page == '/events') &&
+      link.getAttribute('href') == '/events') ||
+    ((page == '/about/' || page == '/about') &&
+      link.getAttribute('href') == '/about') ||
+    ((page == '/posts/' || page == '/posts') &&
+      link.getAttribute('href') == '/posts')
   ) {
     link.classList.add('active');
   }
@@ -20,9 +23,12 @@ Array.from(links).forEach((link) => {
 Array.from(navBarLinks).forEach((link) => {
   if (
     ((page == '/' || page == '/') && link.getAttribute('href') == '/') ||
-    ((page == '/events/' || page == '/events') && link.getAttribute('href') == '/events') ||
-    ((page == '/about/' || page == '/about') && link.getAttribute('href') == '/about') ||
-    ((page == '/posts/' || page == '/posts') && link.getAttribute('href') == '/posts')
+    ((page == '/events/' || page == '/events') &&
+      link.getAttribute('href') == '/events') ||
+    ((page == '/about/' || page == '/about') &&
+      link.getAttribute('href') == '/about') ||
+    ((page == '/posts/' || page == '/posts') &&
+      link.getAttribute('href') == '/posts')
   ) {
     link.classList.add('active');
   }

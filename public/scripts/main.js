@@ -4,6 +4,21 @@ import Api from './http-api.js';
 if (!user.getUser().id) window.location.assign('/auth/login');
 const api = new Api();
 
+const eventSource = new EventSource(
+  `/api/notifications/events?userId=${Number(user.getUser().id)}`,
+);
+
+eventSource.onmessage = function (event) {
+  const data = JSON.parse(event.data);
+
+  if (data.type === 'notification') {
+    toastr.success(data.notification.message);
+
+    // можно обновить список уведомлений
+    // loadNotifications();
+  }
+};
+
 function handleChangeVision(param) {
   if (param == 'list') {
     document.getElementById('events-list').classList.remove('hide');
@@ -35,7 +50,7 @@ function handleRemoveEvent(e, id) {
   }
 
   function hanldeError(e) {
-    console.log(e)
+    console.log(e);
   }
 
   api.deleteEvent(handleSuccess, hanldeError, id);
@@ -84,9 +99,12 @@ function loadEvents(search) {
         eventCard.querySelector('.card-media').style.background =
           `url(${event.image || '/images/theatre.jpg'})`;
         eventCard.querySelector('.card-header').textContent = event.title;
-        eventCard.querySelector('.event-author').textContent = event.author.email;
+        eventCard.querySelector('.event-author').textContent =
+          event.author.email;
         eventCard.querySelector('.event-description').textContent = event.desc;
-        eventCard.querySelector('.event-date').textContent = (new Date(event.date)).toLocaleDateString('ru-RU');
+        eventCard.querySelector('.event-date').textContent = new Date(
+          event.date,
+        ).toLocaleDateString('ru-RU');
         eventCard.querySelector('.event-place').textContent = event.place;
         const link = eventCard.querySelector('.event-button');
         link.setAttribute('href', `/events/${event.id}`);
@@ -104,7 +122,9 @@ function loadEvents(search) {
         eventRow.querySelector('.cell-title').textContent = event.title;
         eventRow.querySelector('.cell-desc').textContent = event.desc;
         eventRow.querySelector('.cell-author').textContent = event.author.email;
-        eventRow.querySelector('.cell-date').textContent = (new Date(event.date)).toLocaleDateString('ru-RU');
+        eventRow.querySelector('.cell-date').textContent = new Date(
+          event.date,
+        ).toLocaleDateString('ru-RU');
         eventRow.querySelector('.cell-place').textContent = event.place;
         tableBody.appendChild(eventRow);
       });

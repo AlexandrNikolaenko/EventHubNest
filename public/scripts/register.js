@@ -93,7 +93,7 @@ function handleSubmit(e) {
     });
   } else {
     try {
-      (new Api()).register(values, onSuccess, onError);
+      new Api().register(values, onSuccess, onError);
     } catch (err) {
       console.log(err);
     }

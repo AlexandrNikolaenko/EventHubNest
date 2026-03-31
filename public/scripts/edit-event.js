@@ -13,7 +13,9 @@ function handleOpenEditModal(id) {
     form.dataset.id = id;
     form.querySelector('#edit-title').value = event.title;
     form.querySelector('#edit-desc').value = event.desc;
-    form.querySelector('#edit-date').value = (new Date(event.date)).toLocaleDateString('ru-RU');
+    form.querySelector('#edit-date').value = new Date(
+      event.date,
+    ).toLocaleDateString('ru-RU');
     form.querySelector('#edit-place').value = event.place;
     document.getElementById('edit-event-modal').classList.add('active');
   }
@@ -25,14 +27,14 @@ function handleOpenEditModal(id) {
   api.getEvent(id, handleSuccess, handleError);
 }
 
-const eventId = Number(document.location.pathname.split('/')[2])
+const eventId = Number(document.location.pathname.split('/')[2]);
 
-handleOpenEditModal(eventId)
+handleOpenEditModal(eventId);
 
 function handleCloseEditModal(e) {
   e.preventDefault();
   document.getElementById('edit-event-modal').classList.remove('active');
-  document.location.assign('/events')
+  document.location.assign('/events');
 }
 
 document
@@ -84,8 +86,8 @@ function handleEditEvent(e) {
   if (validateFormEdit(event)) {
     const body = {
       authorId: Number(user.getUser().id),
-      dto: event
-    }
+      dto: event,
+    };
     api.editEvent(handleSuccess, handleError, body, eventId);
     // store.editEvent(e.target.dataset.id, event);
   }

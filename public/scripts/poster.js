@@ -19,17 +19,17 @@ eventSource.onmessage = function (event) {
 
   switch (data.type) {
     case 'post_created':
-      toastr.success("Post created");
+      toastr.success('Post created');
       loadPoster();
       break;
 
     case 'post_update':
-      toastr.info("Post updated");
+      toastr.info('Post updated');
       loadPoster();
       break;
 
     case 'post_deleted':
-      toastr.warning("Post deleted");
+      toastr.warning('Post deleted');
       loadPoster();
       break;
 
@@ -47,7 +47,9 @@ function handleSuccess(data) {
       'background-image: url(' + elem.image + ')';
     post.querySelector('h6').textContent = elem.title;
     post.querySelector('p').textContent = elem.desc;
-    post.querySelector('.date').textContent = (new Date(elem.date)).toLocaleDateString('ru-RU');
+    post.querySelector('.date').textContent = new Date(
+      elem.date,
+    ).toLocaleDateString('ru-RU');
     post.querySelector('.place').textContent = elem.place;
     post.querySelector('a').setAttribute('href', '/posts/' + elem.id);
 

@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
-import { ReviewService } from './review.service';
-import { ReviewController } from './review.controller';
+import { ReviewsService } from './reviews.service';
+import { ReviewsController } from './reviews.api.controller';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
-  controllers: [ReviewController],
-  providers: [ReviewService],
+  imports: [PrismaModule],
+  controllers: [ReviewsController],
+  providers: [ReviewsService],
 })
-export class ReviewModule {}
+export class ReviewsModule {}

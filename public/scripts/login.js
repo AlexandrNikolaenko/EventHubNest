@@ -60,7 +60,7 @@ function handleSubmit(e) {
     });
   } else {
     try {
-      (new Api()).login(values, onSuccess, onError);
+      new Api().login(values, onSuccess, onError);
     } catch (err) {
       console.log(err);
     }

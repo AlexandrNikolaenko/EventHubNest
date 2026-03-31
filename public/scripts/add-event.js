@@ -63,8 +63,8 @@ function handleCreateEvent(e) {
     event.users = users;
     const body = {
       authorId: Number(user.getUser().id),
-      data: event
-    }
+      data: event,
+    };
     // store.setEvents(event);
     api.createEvents(handleSuccess, handleError, body);
   }
@@ -110,9 +110,9 @@ function setUsers(search) {
       usersList.classList.add('hide');
       return;
     } else usersList.classList.remove('hide');
-  
+
     const userTemplate = document.getElementById('user-template').content;
-  
+
     usersList.innerHTML = '';
     newUsers.forEach((email) => {
       console.log(email);
@@ -139,5 +139,3 @@ function handleChangeUsersInput(e) {
 document
   .getElementById('users')
   .addEventListener('input', handleChangeUsersInput);
-
-

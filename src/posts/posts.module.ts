@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { ApiPostsController, PostsController } from './posts.controller';
+import { PostsController } from './posts.controller';
 import { PrismaModule } from 'src/prisma/prisma.module';
+import { ApiPostsController } from './posts.api.controller';
 
 @Module({
   imports: [PrismaModule],

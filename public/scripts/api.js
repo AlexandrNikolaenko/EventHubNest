@@ -78,7 +78,7 @@ class Store {
 
 class User {
   constructor() {
-    this.id
+    this.id;
   }
 
   updateUser(id) {

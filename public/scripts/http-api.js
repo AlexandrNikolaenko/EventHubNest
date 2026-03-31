@@ -59,10 +59,10 @@ class HttpRequest {
     let redirectPath = '';
     try {
       const res = await fetch(this.#api_host.concat(query), {
-        method: "PUT",
+        method: 'PUT',
         cache: 'no-cache',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(body),
       });
@@ -85,10 +85,10 @@ class HttpRequest {
     let redirectPath = '';
     try {
       const res = await fetch(this.#api_host.concat(query), {
-        method: "PATCH",
+        method: 'PATCH',
         cache: 'no-cache',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(body),
       });
@@ -111,10 +111,10 @@ class HttpRequest {
     let redirectPath = '';
     try {
       const res = await fetch(this.#api_host.concat(query), {
-        method: "DELETE",
+        method: 'DELETE',
         cache: 'no-cache',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
       });
       if (res.ok) {
@@ -145,7 +145,7 @@ export default class Api {
       query: '/users/search?email=' + email,
       onSuccess,
       onError,
-    })
+    });
   }
 
   async editEvent(onSuccess, onError, body, id) {
@@ -153,16 +153,16 @@ export default class Api {
       query: '/events/' + id,
       onSuccess,
       onError,
-      body
-    })
+      body,
+    });
   }
 
   async deleteEvent(onSuccess, onError, id) {
     return await this.#httpRequest.delete({
       query: '/events/' + id,
       onSuccess,
-      onError
-    })
+      onError,
+    });
   }
 
   async createEvents(onSuccess, onError, body) {
@@ -170,8 +170,8 @@ export default class Api {
       query: '/events',
       onSuccess,
       onError,
-      body
-    })
+      body,
+    });
   }
 
   async getEvents(onSuccess, onError, userId) {
@@ -206,7 +206,7 @@ export default class Api {
     });
   }
 
-  async login({email, password}, onSuccess, onError) {
+  async login({ email, password }, onSuccess, onError) {
     return await this.#httpRequest.post({
       body: { email, password },
       query: '/auth/login',
@@ -215,7 +215,7 @@ export default class Api {
     });
   }
 
-  async register({name, email, password}, onSuccess, onError) {
+  async register({ name, email, password }, onSuccess, onError) {
     return await this.#httpRequest.post({
       body: { name, email, password },
       query: '/auth/register',

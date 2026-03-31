@@ -1,54 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Patch,
-  Delete,
-  Render,
-  Query,
-  ParseIntPipe,
-} from '@nestjs/common';
-import { EventsService } from './events.service';
-import { CreateEventDto } from './dto/create-event.dto';
-import { UpdateEventDto } from './dto/update-event.dto';
-
-@Controller('api/events')
-export class ApiEventsController {
-  constructor(private readonly eventsService: EventsService) {}
-
-  @Post()
-  create(
-    @Body() { authorId, data }: { authorId: number; data: CreateEventDto },
-  ) {
-    return this.eventsService.create(authorId, data);
-  }
-
-  @Get()
-  findAll(@Query('userId', ParseIntPipe) userId: number) {
-    console.log('userId', userId);
-    return this.eventsService.findAll(userId);
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.eventsService.findOne(Number(id));
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() { authorId, dto }: { authorId: number; dto: UpdateEventDto },
-  ) {
-    return this.eventsService.update(Number(id), authorId, dto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.eventsService.remove(Number(id));
-  }
-}
+import { Controller, Get, Param, Render } from '@nestjs/common';
 
 @Controller('events')
 export class EventsController {
@@ -59,6 +9,11 @@ export class EventsController {
   main() {
     return {
       extraHead: `<link rel="stylesheet" href="/styles/main.css" />
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script type="module" src="/scripts/api.js"></script>`,
       pageModuleScripts: ['main.js'],
       pageTemplates: [
