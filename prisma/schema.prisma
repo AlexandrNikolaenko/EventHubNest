@@ -11,9 +11,13 @@ model User {
   name           String
   email          String         @unique
   password       String
+
   authoredEvents Event[]        @relation("EventAuthor")
   posts          Post[]
   registrations  Registration[]
+
+  reviews        Review[]
+  notifications Notification[]
 }
 
 model Event {
@@ -43,15 +47,19 @@ model Post {
   id         Int       @id @default(autoincrement())
   title      String
   desc       String
+  image      String
   date       DateTime
   place      String
   authorId   Int
   categoryId Int?
-  image      String
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt @default(now())
+
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
   author     User      @relation(fields: [authorId], references: [id])
   category   Category? @relation(fields: [categoryId], references: [id])
+
+  reviews    Review[]
 }
 
 model Category {
@@ -59,4 +67,29 @@ model Category {
   name   String  @unique
   events Event[]
   posts  Post[]
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  content   String
+  rating    Int?     // можно оценку 1-5
+  authorId  Int
+  postId    Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  message   String
+  isRead    Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

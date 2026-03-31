@@ -4,7 +4,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 class PrismaService extends PrismaClient {
   constructor() {
     const adapter = new PrismaPg({
-      connectionString: "postgresql://alibaba:3JAh5NIJS7VUhVJUqdZOvgCbQTKQBEHn@dpg-d6ddinp4tr6s73cocpvg-a.frankfurt-postgres.render.com/eventhub_noua?sslmode=require",
+      connectionString: "postgresql://alibaba:MNJWR1bTKr6WcqC27tS2TSal2K3DOG6r@dpg-d75b5375r7bs73b25jag-a.frankfurt-postgres.render.com/eventhub_if6g?sslmode=require",
     });
     super({ adapter });
   }
