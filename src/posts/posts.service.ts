@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -28,7 +32,6 @@ export class PostsService {
     ]);
 
     this.lastCount = count;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     this.lastUpdatedAt = latest?.updatedAt ?? null;
 
     interval(5000).subscribe(() => {
@@ -45,7 +48,6 @@ export class PostsService {
       }),
     ]);
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const updatedAt = latest?.updatedAt ?? null;
 
     if (count > this.lastCount) {
@@ -59,7 +61,6 @@ export class PostsService {
     } else if (
       updatedAt &&
       this.lastUpdatedAt &&
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       updatedAt.getTime() !== this.lastUpdatedAt.getTime()
     ) {
       this.eventSubject.next({
@@ -68,7 +69,6 @@ export class PostsService {
     }
 
     this.lastCount = count;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     this.lastUpdatedAt = updatedAt;
   }
 
@@ -86,16 +86,6 @@ export class PostsService {
 
     this.emitPostUpdate(post);
     return post;
-    // return this.prisma.post.create({
-    //   data: {
-    //     title: dto.title,
-    //     desc: dto.desc,
-    //     date: dto.date,
-    //     place: dto.place,
-    //     authorId: dto.authorId,
-    //     image: dto.image,
-    //   },
-    // });
   }
 
   async findAll() {
@@ -103,21 +93,39 @@ export class PostsService {
   }
 
   async findOne(id: number) {
-    return this.repository.findOne(id);
+    if (isNaN(Number(id))) {
+      throw new BadRequestException('Id should be integer');
+    }
+    const post = await this.repository.findOne(id);
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+    return post;
   }
 
   async update(id: number, dto: UpdatePostDto) {
+    if (isNaN(Number(id))) {
+      throw new BadRequestException('Id should be integer');
+    }
     const post = await this.repository.update(id, dto);
 
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
     this.emitPostUpdate(post);
     return post;
-    // return this.prisma.post.update({
-    //   where: { id },
-    //   data: dto,
-    // });
   }
 
   async remove(id: number) {
+    if (isNaN(Number(id))) {
+      throw new BadRequestException('Id should be integer');
+    }
+    const post = await this.repository.findOne(id);
+
+    if (!post) {
+      throw new NotFoundException('Event not found');
+    }
     await this.repository.remove(id);
     this.eventSubject.next({
       data: {
@@ -126,8 +134,5 @@ export class PostsService {
       },
     });
     return;
-    // return this.prisma.post.delete({
-    //   where: { id },
-    // });
   }
 }

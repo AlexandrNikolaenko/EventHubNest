@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -27,8 +28,10 @@ export class EventsService {
   }
 
   async findOne(id: number) {
+    if (isNaN(Number(id))) {
+      throw new BadRequestException('Id should be integer');
+    }
     const event = await this.repository.findOne(id);
-
     if (!event) {
       throw new NotFoundException('Event not found');
     }
@@ -37,6 +40,9 @@ export class EventsService {
   }
 
   async update(id: number, userId: number, dto: UpdateEventDto) {
+    if (isNaN(Number(id))) {
+      throw new BadRequestException('Id should be integer');
+    }
     const event = await this.repository.findOne(id);
 
     if (!event) {

@@ -1,9 +1,10 @@
-import { Controller, Get, Render } from '@nestjs/common';
+import { Controller, Get, Render, Res, Param } from '@nestjs/common';
+import express from 'express';
 
 @Controller('posts')
 export class PostsController {
   @Get()
-  @Render('poster')
+  @Render('posts')
   poster() {
     return {
       extraHead: `<link rel="stylesheet" href="/styles/poster.css" />
@@ -20,15 +21,21 @@ export class PostsController {
   }
 
   @Get(':id')
-  @Render('poster-event')
-  posterEvent() {
-    return {
+  @Render('post')
+  posterEvent(@Param('id') id: string, @Res() res: express.Response) {
+    const parsedId = Number(id);
+
+    if (isNaN(parsedId)) {
+      return res.redirect('/not-found');
+    }
+
+    return res.render('poster-event', {
       extraHead: `<link rel="stylesheet" href="../../styles/poster.css" />
     <link rel="stylesheet" href="../../styles/poster-event.css" />
     <script type="module" src="../../scripts/api.js"></script>
     <script type="module" src="../../scripts/http-api.js"></script>`,
       pageModuleScripts: ['poster-event.js'],
       pageTemplates: [{ name: 'templates/post-event' }],
-    };
+    });
   }
 }

@@ -6,7 +6,7 @@ export class EventsController {
   constructor() {}
 
   @Get()
-  @Render('main')
+  @Render('events')
   main() {
     return {
       extraHead: `<link rel="stylesheet" href="/styles/main.css" />
