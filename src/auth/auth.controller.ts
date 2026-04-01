@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Render } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.gto';
+import { ApiExcludeController } from '@nestjs/swagger';
 
 @Controller('api/auth')
 export class ApiAuthController {
@@ -18,6 +19,7 @@ export class ApiAuthController {
   }
 }
 
+@ApiExcludeController()
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

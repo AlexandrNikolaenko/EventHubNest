@@ -15,7 +15,20 @@ import { NotificationsService } from './notifications.service';
 import { Observable } from 'rxjs';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiQuery,
+  ApiBody,
+  ApiOkResponse,
+  ApiCreatedResponse,
+  ApiBadRequestResponse,
+  ApiNotFoundResponse,
+  ApiInternalServerErrorResponse,
+  ApiNoContentResponse,
+} from '@nestjs/swagger';
 
 @ApiTags('Notifications')
 @Controller('api/notifications')
@@ -23,26 +36,64 @@ export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
   @Sse('events')
+  @ApiOperation({ summary: 'Subscribe to notification SSE stream' })
+  @ApiQuery({
+    name: 'userId',
+    required: true,
+    type: Number,
+    description: 'User id',
+  })
+  @ApiOkResponse({
+    description: 'SSE stream of notifications',
+    content: {
+      'text/event-stream': {
+        schema: {
+          type: 'string',
+          example: 'data: {"id":1,"message":"..."}\n\n',
+        },
+      },
+    },
+  })
   sse(@Query('userId', ParseIntPipe) userId: number): Observable<MessageEvent> {
     return this.notificationsService.getUserStream(userId);
   }
 
   @Post()
+  @ApiOperation({ summary: 'Create a notification' })
+  @ApiBody({ type: CreateNotificationDto })
+  @ApiCreatedResponse({ description: 'Notification created' })
+  @ApiBadRequestResponse({ description: 'Invalid notification data' })
+  @ApiInternalServerErrorResponse({ description: 'Internal error' })
   create(@Body() dto: CreateNotificationDto) {
     return this.notificationsService.create(dto);
   }
 
   @Get()
+  @ApiOperation({ summary: 'Get notifications by user id' })
+  @ApiQuery({ name: 'userId', required: true, type: Number })
+  @ApiResponse({ status: 200, description: 'Notifications list' })
+  @ApiNotFoundResponse({ description: 'User not found or no notifications' })
   findAll(@Query('userId', ParseIntPipe) userId: number) {
     return this.notificationsService.findAll(userId);
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get notification by id' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 200, description: 'Notification data' })
+  @ApiNotFoundResponse({ description: 'Notification not found' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.notificationsService.findOne(id);
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Update notification state' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiQuery({ name: 'userId', required: true, type: Number })
+  @ApiBody({ type: UpdateNotificationDto })
+  @ApiResponse({ status: 200, description: 'Notification updated' })
+  @ApiBadRequestResponse({ description: 'Invalid data' })
+  @ApiNotFoundResponse({ description: 'Notification not found' })
   update(
     @Param('id', ParseIntPipe) id: number,
     @Query('userId', ParseIntPipe) userId: number,
@@ -52,6 +103,11 @@ export class NotificationsController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete notification by id' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiQuery({ name: 'userId', required: true, type: Number })
+  @ApiNoContentResponse({ description: 'Deleted successfully' })
+  @ApiNotFoundResponse({ description: 'Notification not found' })
   remove(
     @Param('id', ParseIntPipe) id: number,
     @Query('userId', ParseIntPipe) userId: number,
