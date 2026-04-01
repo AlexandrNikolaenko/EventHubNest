@@ -22,17 +22,6 @@ async function main() {
     skipDuplicates: true,
   });
 
-  // 2️⃣ Создаём категории
-  await prisma.category.createMany({
-    data: [
-      { id: 1, name: 'Tech' },
-      { id: 2, name: 'Business' },
-      { id: 3, name: 'Music' },
-      { id: 4, name: 'Art' },
-    ],
-    skipDuplicates: true,
-  });
-
   await prisma.post.createMany({
     data: [
       {
@@ -42,7 +31,6 @@ async function main() {
         date: new Date('2026-03-10T12:00:00Z'),
         place: 'Berlin',
         authorId: 1,
-        categoryId: 1,
       },
       {
         title: 'Startup Meetup',
@@ -51,7 +39,6 @@ async function main() {
         date: new Date('2026-04-05T15:30:00Z'),
         place: 'London',
         authorId: 1,
-        categoryId: 2,
       },
       {
         title: 'Design Workshop',
@@ -60,7 +47,6 @@ async function main() {
         date: new Date('2026-05-12T09:00:00Z'),
         place: 'Amsterdam',
         authorId: 2,
-        categoryId: 1,
       },
       {
         title: 'Music Festival',
@@ -69,7 +55,6 @@ async function main() {
         date: new Date('2026-06-20T18:00:00Z'),
         place: 'Barcelona',
         authorId: 2,
-        categoryId: 3,
       },
       {
         title: 'AI Hackathon',
@@ -78,7 +63,6 @@ async function main() {
         date: new Date('2026-07-01T10:00:00Z'),
         place: 'Paris',
         authorId: 1,
-        categoryId: 1,
       },
       {
         title: 'Marketing Summit',
@@ -87,7 +71,6 @@ async function main() {
         date: new Date('2026-08-15T11:00:00Z'),
         place: 'New York',
         authorId: 3,
-        categoryId: 2,
       },
       {
         title: 'Photography Expo',
@@ -96,7 +79,6 @@ async function main() {
         date: new Date('2026-09-03T13:00:00Z'),
         place: 'Rome',
         authorId: 3,
-        categoryId: null,
       },
       {
         title: 'Gaming Convention',
@@ -105,7 +87,6 @@ async function main() {
         date: new Date('2026-10-18T14:00:00Z'),
         place: 'Tokyo',
         authorId: 2,
-        categoryId: 4,
       },
       {
         title: 'Blockchain Forum',
@@ -114,7 +95,6 @@ async function main() {
         date: new Date('2026-11-22T16:00:00Z'),
         place: 'Dubai',
         authorId: 1,
-        categoryId: 1,
       },
       {
         title: 'Art & Culture Fair',
@@ -123,7 +103,6 @@ async function main() {
         date: new Date('2026-12-05T17:00:00Z'),
         place: 'Vienna',
         authorId: 3,
-        categoryId: 3,
       },
     ],
   });

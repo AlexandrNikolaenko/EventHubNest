@@ -1,7 +1,7 @@
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateEventDto } from '../dto/create-event.dto';
 import { UpdateEventDto } from '../dto/update-event.dto';
-import { ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 
 export class EventsRepository {
   constructor(private prisma: PrismaService) {}
@@ -18,6 +18,18 @@ export class EventsRepository {
       },
     });
 
+    if (users.length !== dto.users.length) {
+      throw new NotFoundException('Some users not found');
+    }
+
+    const author = await this.prisma.user.findUnique({
+      where: { id: authorId },
+    });
+
+    if (!author) {
+      throw new ForbiddenException('Author not found');
+    }
+
     const event = await this.prisma.event.create({
       data: {
         title: dto.title,
@@ -29,12 +41,6 @@ export class EventsRepository {
             id: Number(authorId),
           },
         },
-        category: {
-          connect: {
-            id: 2,
-            // id: Number(dto.categoryId),
-          },
-        },
 
         registrations: {
           create: users.map((user) => ({
@@ -44,7 +50,6 @@ export class EventsRepository {
       },
       include: {
         author: true,
-        category: true,
         registrations: {
           include: {
             user: {
@@ -78,7 +83,6 @@ export class EventsRepository {
       },
       include: {
         author: true,
-        category: true,
         registrations: {
           include: {
             user: {
@@ -102,7 +106,6 @@ export class EventsRepository {
       where: { id },
       include: {
         author: true,
-        category: true,
         registrations: {
           include: {
             user: {
@@ -142,7 +145,6 @@ export class EventsRepository {
         desc: dto.desc,
         place: dto.place,
         date: dto.date ? new Date(dto.date) : undefined,
-        categoryId: dto.categoryId,
 
         registrations: {
           deleteMany: {},

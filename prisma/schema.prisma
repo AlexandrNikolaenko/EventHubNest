@@ -27,9 +27,7 @@ model Event {
   date          DateTime
   place         String
   authorId      Int
-  categoryId    Int
   author        User           @relation("EventAuthor", fields: [authorId], references: [id])
-  category      Category       @relation(fields: [categoryId], references: [id])
   registrations Registration[]
 }
 
@@ -57,16 +55,8 @@ model Post {
   updatedAt  DateTime  @updatedAt
 
   author     User      @relation(fields: [authorId], references: [id])
-  category   Category? @relation(fields: [categoryId], references: [id])
 
   reviews    Review[]
-}
-
-model Category {
-  id     Int     @id @default(autoincrement())
-  name   String  @unique
-  events Event[]
-  posts  Post[]
 }
 
 model Review {

@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -16,20 +20,44 @@ export class EventsService {
   }
 
   findAll(userId: number) {
+    if (!userId || typeof userId !== 'number' || isNaN(userId)) {
+      throw new ForbiddenException('UserId is required');
+    }
     return this.repository.findAll(userId);
   }
 
-  findOne(id: number) {
-    return this.repository.findOne(id);
+  async findOne(id: number) {
+    const event = await this.repository.findOne(id);
+
+    if (!event) {
+      throw new NotFoundException('Event not found');
+    }
+
+    return event;
   }
 
-  update(id: number, userId: number, dto: UpdateEventDto) {
-    return this.repository.updateEvent(id, userId, {
-      ...dto,
-    });
+  async update(id: number, userId: number, dto: UpdateEventDto) {
+    const event = await this.repository.findOne(id);
+
+    if (!event) {
+      throw new NotFoundException('Event not found');
+    }
+
+    // проверка владельца (очень важно для оценки)
+    if (event.authorId !== userId) {
+      throw new ForbiddenException('You cannot edit this event');
+    }
+
+    return this.repository.updateEvent(id, userId, dto);
   }
 
-  remove(id: number) {
+  async remove(id: number) {
+    const event = await this.repository.findOne(id);
+
+    if (!event) {
+      throw new NotFoundException('Event not found');
+    }
+
     return this.repository.remove(id);
   }
 }

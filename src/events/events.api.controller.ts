@@ -21,6 +21,7 @@ export class ApiEventsController {
   create(
     @Body() { authorId, data }: { authorId: number; data: CreateEventDto },
   ) {
+    console.log(data);
     return this.eventsService.create(authorId, data);
   }
 

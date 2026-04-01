@@ -2,7 +2,6 @@ import {
   IsArray,
   IsDateString,
   IsEmail,
-  IsInt,
   IsNotEmpty,
   IsString,
 } from 'class-validator';
@@ -23,10 +22,6 @@ export class CreateEventDto {
   @IsDateString()
   @IsNotEmpty()
   date: string;
-
-  @IsInt()
-  @IsNotEmpty()
-  categoryId: number;
 
   @IsArray()
   @IsNotEmpty()

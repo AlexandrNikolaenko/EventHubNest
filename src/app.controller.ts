@@ -30,4 +30,17 @@ export class AppController {
       pageModuleScripts: ['animation.js'],
     };
   }
+
+  @Get('/not-found')
+  @Render('not-found')
+  notFound() {
+    return {
+      extraHead: `<link rel="stylesheet" href="/styles/not-found.css" />
+    <script type="module" src="/scripts/api.js"></script>`,
+      pageScripts: [
+        'https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js',
+      ],
+      pageModuleScripts: ['animation.js'],
+    };
+  }
 }

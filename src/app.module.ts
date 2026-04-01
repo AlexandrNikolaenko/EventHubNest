@@ -5,7 +5,6 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { PostsModule } from './posts/posts.module';
 import { EventsModule } from './events/events.module';
-import { CategoriesModule } from './categories/categories.module';
 import { UsersModule } from './users/users.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { ReviewsModule } from './reviews/review.module';
@@ -16,7 +15,6 @@ import { ReviewsModule } from './reviews/review.module';
     AuthModule,
     PostsModule,
     EventsModule,
-    CategoriesModule,
     UsersModule,
     NotificationsModule,
     ReviewsModule,
