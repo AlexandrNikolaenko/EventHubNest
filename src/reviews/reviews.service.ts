@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -12,22 +16,46 @@ export class ReviewsService {
   }
 
   async create(dto: CreateReviewDto) {
-    return this.repository.create(dto);
+    return await this.repository.create(dto);
   }
 
   async findAll() {
-    return this.repository.findAll();
+    return await this.repository.findAll();
   }
 
   async findOne(id: number) {
-    return this.repository.findOne(id);
+    if (isNaN(Number(id))) {
+      throw new BadRequestException('Id should be integer');
+    }
+    const review = await this.repository.findOne(id);
+
+    if (!review) {
+      throw new NotFoundException('Review not found');
+    }
+    return review;
   }
 
-  async update(id: number, dto: UpdateReviewDto) {
-    return this.repository.update(id, dto);
+  async update(id: number, userId: number, dto: UpdateReviewDto) {
+    if (isNaN(Number(id))) {
+      throw new BadRequestException('Id should be integer');
+    }
+    const review = await this.repository.findOne(id);
+
+    if (!review) {
+      throw new NotFoundException('Review not found');
+    }
+    return await this.repository.update(id, userId, dto);
   }
 
   async remove(id: number) {
-    return this.repository.remove(id);
+    if (isNaN(Number(id))) {
+      throw new BadRequestException('Id should be integer');
+    }
+    const review = await this.repository.findOne(id);
+
+    if (!review) {
+      throw new NotFoundException('Review not found');
+    }
+    return await this.repository.remove(id);
   }
 }

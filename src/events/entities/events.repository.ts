@@ -127,7 +127,7 @@ export class EventsRepository {
     });
 
     if (event && event.authorId !== userId) {
-      throw new ForbiddenException();
+      throw new ForbiddenException('Author not found');
     }
 
     const users = await this.prisma.user.findMany({

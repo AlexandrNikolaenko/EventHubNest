@@ -1,11 +1,20 @@
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateReviewDto } from '../dto/create-review.dto';
 import { UpdateReviewDto } from '../dto/update-review.dto';
+import { ForbiddenException } from '@nestjs/common';
 
 export class ReviewsRepository {
   constructor(private prisma: PrismaService) {}
 
   async create(dto: CreateReviewDto) {
+    const author = await this.prisma.user.findUnique({
+      where: { id: dto.authorId },
+    });
+
+    if (!author) {
+      throw new ForbiddenException('Author not found');
+    }
+
     await this.prisma.notification.create({
       data: {
         userId: dto.authorId,
@@ -45,7 +54,14 @@ export class ReviewsRepository {
     });
   }
 
-  async update(id: number, dto: UpdateReviewDto) {
+  async update(id: number, userId: number, dto: UpdateReviewDto) {
+    const event = await this.prisma.review.findUnique({
+      where: { id },
+    });
+
+    if (event && event.authorId !== userId) {
+      throw new ForbiddenException('Author not found');
+    }
     return await this.prisma.review.update({
       where: { id },
       data: dto,
