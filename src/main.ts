@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { engine } from 'express-handlebars';
 import { ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './common/filters/http-exeption.filter';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -34,6 +35,16 @@ async function bootstrap() {
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
 
   app.useStaticAssets(join(__dirname, '..', 'public'));
+
+  const config = new DocumentBuilder()
+    .setTitle('My API')
+    .setDescription('Events & Posts API')
+    .setVersion('1.0')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+
+  SwaggerModule.setup('api/docs', app, document);
 
   await app.listen(configService.get('PORT') ?? 3000);
 }

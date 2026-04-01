@@ -20,11 +20,11 @@ export class EventsService {
     return this.repository.create(authorId, dto);
   }
 
-  findAll(userId: number) {
+  findAll(userId: number, page = 1, limit = 10) {
     if (!userId || typeof userId !== 'number' || isNaN(userId)) {
       throw new ForbiddenException('UserId is required');
     }
-    return this.repository.findAll(userId);
+    return this.repository.findAll(userId, page, limit);
   }
 
   async findOne(id: number) {

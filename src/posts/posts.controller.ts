@@ -1,6 +1,8 @@
 import { Controller, Get, Render, Res, Param } from '@nestjs/common';
+import { ApiExcludeController } from '@nestjs/swagger';
 import express from 'express';
 
+@ApiExcludeController()
 @Controller('posts')
 export class PostsController {
   @Get()

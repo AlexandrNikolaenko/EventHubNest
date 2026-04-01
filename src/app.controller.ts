@@ -1,5 +1,7 @@
 import { Get, Controller, Render, Query } from '@nestjs/common';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Controller()
 export class AppController {
   @Get('/')

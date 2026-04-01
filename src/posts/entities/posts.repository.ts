@@ -11,8 +11,11 @@ export class PostsRepository {
     });
   }
 
-  async findAll() {
-    return await this.prisma.post.findMany();
+  async findAll(page: number, limit: number) {
+    return await this.prisma.post.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+    });
   }
 
   async findOne(id: number) {

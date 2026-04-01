@@ -88,8 +88,8 @@ export class PostsService {
     return post;
   }
 
-  async findAll() {
-    return this.repository.findAll();
+  async findAll(page: number, limit: number) {
+    return this.repository.findAll(page, limit);
   }
 
   async findOne(id: number) {

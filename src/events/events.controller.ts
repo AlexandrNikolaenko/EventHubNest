@@ -1,6 +1,8 @@
 import { Controller, Get, Param, Render, Res } from '@nestjs/common';
+import { ApiExcludeController } from '@nestjs/swagger';
 import express from 'express';
 
+@ApiExcludeController()
 @Controller('events')
 export class EventsController {
   constructor() {}

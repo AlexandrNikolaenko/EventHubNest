@@ -67,7 +67,7 @@ export class EventsRepository {
     return event;
   }
 
-  async findAll(userId: number) {
+  async findAll(userId: number, skip: number, take: number) {
     return this.prisma.event.findMany({
       where: {
         OR: [
@@ -95,6 +95,8 @@ export class EventsRepository {
           },
         },
       },
+      skip,
+      take,
       orderBy: {
         date: 'asc',
       },
