@@ -22,7 +22,12 @@ export class UsersApiController {
     type: String,
     description: 'Email fragment to search',
   })
-  @ApiResponse({ status: 200, description: 'Matching users list' })
+  @ApiResponse({
+    status: 200,
+    description: 'Matching users list',
+    type: Object,
+    isArray: true,
+  })
   @ApiBadRequestResponse({ description: 'Missing email query' })
   @ApiNotFoundResponse({ description: 'No users found' })
   searchUsers(@Query('email') email: string) {

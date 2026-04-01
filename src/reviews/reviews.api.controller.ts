@@ -34,7 +34,7 @@ export class ReviewsController {
   @Post()
   @ApiOperation({ summary: 'Create a review' })
   @ApiBody({ type: CreateReviewDto })
-  @ApiCreatedResponse({ description: 'Review created' })
+  @ApiCreatedResponse({ description: 'Review created', type: CreateReviewDto })
   @ApiBadRequestResponse({ description: 'Invalid review data' })
   @ApiInternalServerErrorResponse({ description: 'Internal error' })
   create(@Body() dto: CreateReviewDto) {
@@ -43,7 +43,12 @@ export class ReviewsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all reviews' })
-  @ApiResponse({ status: 200, description: 'Review list' })
+  @ApiResponse({
+    status: 200,
+    description: 'Review list',
+    type: CreateReviewDto,
+    isArray: true,
+  })
   findAll() {
     return this.reviewsService.findAll();
   }
@@ -51,7 +56,11 @@ export class ReviewsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get review by id' })
   @ApiParam({ name: 'id', type: Number })
-  @ApiResponse({ status: 200, description: 'Review data' })
+  @ApiResponse({
+    status: 200,
+    description: 'Review data',
+    type: CreateReviewDto,
+  })
   @ApiNotFoundResponse({ description: 'Review not found' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.reviewsService.findOne(id);
@@ -62,7 +71,11 @@ export class ReviewsController {
   @ApiParam({ name: 'id', type: Number })
   @ApiQuery({ name: 'userId', required: true, type: Number })
   @ApiBody({ type: UpdateReviewDto })
-  @ApiResponse({ status: 200, description: 'Review updated' })
+  @ApiResponse({
+    status: 200,
+    description: 'Review updated',
+    type: UpdateReviewDto,
+  })
   @ApiNotFoundResponse({ description: 'Review not found' })
   @ApiBadRequestResponse({ description: 'Invalid input' })
   update(

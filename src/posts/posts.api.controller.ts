@@ -57,7 +57,10 @@ export class ApiPostsController {
   @Post()
   @ApiOperation({ summary: 'Create a new post' })
   @ApiBody({ type: CreatePostDto })
-  @ApiCreatedResponse({ description: 'Post created successfully' })
+  @ApiCreatedResponse({
+    description: 'Post created successfully',
+    type: CreatePostDto,
+  })
   @ApiBadRequestResponse({ description: 'Invalid payload' })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
   create(@Body() createPostDto: CreatePostDto) {
@@ -68,7 +71,12 @@ export class ApiPostsController {
   @ApiOperation({ summary: 'Get posts list with pagination' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
-  @ApiResponse({ status: 200, description: 'List of posts' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of posts',
+    type: CreatePostDto,
+    isArray: true,
+  })
   @ApiBadRequestResponse({ description: 'Invalid query parameters' })
   async findAll(
     @Query('page', ParseIntPipe) page = 1,
@@ -104,7 +112,7 @@ export class ApiPostsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get post by id' })
   @ApiParam({ name: 'id', type: Number })
-  @ApiResponse({ status: 200, description: 'Post data' })
+  @ApiResponse({ status: 200, description: 'Post data', type: CreatePostDto })
   @ApiNotFoundResponse({ description: 'Post not found' })
   @ApiBadRequestResponse({ description: 'Invalid id' })
   findOne(@Param('id') id: string) {
@@ -115,7 +123,11 @@ export class ApiPostsController {
   @ApiOperation({ summary: 'Update post by id' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdatePostDto })
-  @ApiResponse({ status: 200, description: 'Post updated' })
+  @ApiResponse({
+    status: 200,
+    description: 'Post updated',
+    type: UpdatePostDto,
+  })
   @ApiNotFoundResponse({ description: 'Post not found' })
   @ApiBadRequestResponse({ description: 'Invalid payload or id' })
   update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {

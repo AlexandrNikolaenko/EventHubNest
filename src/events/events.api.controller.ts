@@ -59,7 +59,10 @@ export class ApiEventsController {
   @Post()
   @ApiOperation({ summary: 'Create a new event' })
   @ApiBody({ type: CreateEventRequestDto })
-  @ApiCreatedResponse({ description: 'Event created successfully' })
+  @ApiCreatedResponse({
+    description: 'Event created successfully',
+    type: CreateEventDto,
+  })
   @ApiBadRequestResponse({ description: 'Validation failed' })
   @ApiInternalServerErrorResponse({ description: 'Internal error' })
   create(
@@ -91,7 +94,12 @@ export class ApiEventsController {
     description: 'Items per page',
     example: 10,
   })
-  @ApiResponse({ status: 200, description: 'List of events' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of events',
+    type: CreateEventDto,
+    isArray: true,
+  })
   @ApiBadRequestResponse({ description: 'Invalid query parameters' })
   @ApiInternalServerErrorResponse({ description: 'Internal error' })
   async findAll(
@@ -133,7 +141,11 @@ export class ApiEventsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get event by id' })
   @ApiParam({ name: 'id', type: Number, description: 'Event id' })
-  @ApiResponse({ status: 200, description: 'Event in detail' })
+  @ApiResponse({
+    status: 200,
+    description: 'Event in detail',
+    type: CreateEventDto,
+  })
   @ApiNotFoundResponse({ description: 'Event not found' })
   @ApiBadRequestResponse({ description: 'Invalid id' })
   findOne(@Param('id') id: string) {
@@ -144,7 +156,11 @@ export class ApiEventsController {
   @ApiOperation({ summary: 'Update event by id' })
   @ApiParam({ name: 'id', type: Number, description: 'Event id' })
   @ApiBody({ type: UpdateEventRequestDto })
-  @ApiResponse({ status: 200, description: 'Updated event' })
+  @ApiResponse({
+    status: 200,
+    description: 'Updated event',
+    type: CreateEventDto,
+  })
   @ApiNotFoundResponse({ description: 'Event not found' })
   @ApiBadRequestResponse({ description: 'Invalid payload or id' })
   update(

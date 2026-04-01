@@ -61,7 +61,10 @@ export class NotificationsController {
   @Post()
   @ApiOperation({ summary: 'Create a notification' })
   @ApiBody({ type: CreateNotificationDto })
-  @ApiCreatedResponse({ description: 'Notification created' })
+  @ApiCreatedResponse({
+    description: 'Notification created',
+    type: CreateNotificationDto,
+  })
   @ApiBadRequestResponse({ description: 'Invalid notification data' })
   @ApiInternalServerErrorResponse({ description: 'Internal error' })
   create(@Body() dto: CreateNotificationDto) {
@@ -71,7 +74,12 @@ export class NotificationsController {
   @Get()
   @ApiOperation({ summary: 'Get notifications by user id' })
   @ApiQuery({ name: 'userId', required: true, type: Number })
-  @ApiResponse({ status: 200, description: 'Notifications list' })
+  @ApiResponse({
+    status: 200,
+    description: 'Notifications list',
+    type: CreateNotificationDto,
+    isArray: true,
+  })
   @ApiNotFoundResponse({ description: 'User not found or no notifications' })
   findAll(@Query('userId', ParseIntPipe) userId: number) {
     return this.notificationsService.findAll(userId);
@@ -80,7 +88,11 @@ export class NotificationsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get notification by id' })
   @ApiParam({ name: 'id', type: Number })
-  @ApiResponse({ status: 200, description: 'Notification data' })
+  @ApiResponse({
+    status: 200,
+    description: 'Notification data',
+    type: CreateNotificationDto,
+  })
   @ApiNotFoundResponse({ description: 'Notification not found' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.notificationsService.findOne(id);
@@ -91,7 +103,11 @@ export class NotificationsController {
   @ApiParam({ name: 'id', type: Number })
   @ApiQuery({ name: 'userId', required: true, type: Number })
   @ApiBody({ type: UpdateNotificationDto })
-  @ApiResponse({ status: 200, description: 'Notification updated' })
+  @ApiResponse({
+    status: 200,
+    description: 'Notification updated',
+    type: UpdateNotificationDto,
+  })
   @ApiBadRequestResponse({ description: 'Invalid data' })
   @ApiNotFoundResponse({ description: 'Notification not found' })
   update(
