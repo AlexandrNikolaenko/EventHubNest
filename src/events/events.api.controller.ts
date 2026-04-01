@@ -26,7 +26,6 @@ export class ApiEventsController {
 
   @Get()
   findAll(@Query('userId', ParseIntPipe) userId: number) {
-    console.log('userId', userId);
     return this.eventsService.findAll(userId);
   }
 
