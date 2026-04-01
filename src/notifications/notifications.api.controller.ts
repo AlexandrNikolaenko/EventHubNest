@@ -9,6 +9,7 @@ import {
   Query,
   Sse,
   MessageEvent,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
 import { Observable } from 'rxjs';
@@ -20,8 +21,8 @@ export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
   @Sse('events')
-  sse(@Query('userId') userId: string): Observable<MessageEvent> {
-    return this.notificationsService.getUserStream(Number(userId));
+  sse(@Query('userId', ParseIntPipe) userId: number): Observable<MessageEvent> {
+    return this.notificationsService.getUserStream(userId);
   }
 
   @Post()
@@ -30,24 +31,29 @@ export class NotificationsController {
   }
 
   @Get()
-  findAll(@Query('userId') userId?: string) {
-    return this.notificationsService.findAll(
-      userId ? Number(userId) : undefined,
-    );
+  findAll(@Query('userId', ParseIntPipe) userId: number) {
+    return this.notificationsService.findAll(userId);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.notificationsService.findOne(Number(id));
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.notificationsService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateNotificationDto) {
-    return this.notificationsService.update(Number(id), dto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('userId', ParseIntPipe) userId: number,
+    @Body() dto: UpdateNotificationDto,
+  ) {
+    return this.notificationsService.update(id, userId, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.notificationsService.remove(Number(id));
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('userId', ParseIntPipe) userId: number,
+  ) {
+    return this.notificationsService.remove(id, userId);
   }
 }

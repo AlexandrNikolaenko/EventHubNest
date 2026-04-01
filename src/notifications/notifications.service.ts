@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { NotificationsRepository } from './entities/notifications.repository';
@@ -40,19 +45,49 @@ export class NotificationsService {
     return notification;
   }
 
-  async findAll(userId?: number) {
+  async findAll(userId: number) {
     return this.repository.findAll(userId);
   }
 
   async findOne(id: number) {
+    if (isNaN(Number(id))) {
+      throw new BadRequestException('Id should be integer');
+    }
+    const notification = await this.repository.findOne(id);
+    if (!notification) {
+      throw new NotFoundException('Notification not found');
+    }
     return this.repository.findOne(id);
   }
 
-  async update(id: number, dto: UpdateNotificationDto) {
+  async update(id: number, userId: number, dto: UpdateNotificationDto) {
+    const notification = await this.prisma.notification.findUnique({
+      where: { id },
+    });
+
+    if (!notification) {
+      throw new NotFoundException('Notification not found');
+    }
+
+    if (notification.userId !== userId) {
+      throw new ForbiddenException('Author not found');
+    }
     return this.repository.update(id, dto);
   }
 
-  async remove(id: number) {
+  async remove(id: number, userId: number) {
+    const notification = await this.prisma.notification.findUnique({
+      where: { id },
+    });
+
+    if (!notification) {
+      throw new NotFoundException('Notification not found');
+    }
+
+    if (notification.userId !== userId) {
+      throw new ForbiddenException('Author not found');
+    }
+
     return this.repository.remove(id);
   }
 }
