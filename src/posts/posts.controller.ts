@@ -1,6 +1,11 @@
-import { Controller, Get, Render, Res, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Render,
+  Param,
+  NotFoundException,
+} from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
-import express from 'express';
 
 @ApiExcludeController()
 @Controller('posts')
@@ -24,20 +29,20 @@ export class PostsController {
 
   @Get(':id')
   @Render('post')
-  posterEvent(@Param('id') id: string, @Res() res: express.Response) {
+  posterEvent(@Param('id') id: string) {
     const parsedId = Number(id);
 
     if (isNaN(parsedId)) {
-      return res.redirect('/not-found');
+      throw new NotFoundException();
     }
 
-    return res.render('poster-event', {
+    return {
       extraHead: `<link rel="stylesheet" href="../../styles/poster.css" />
-    <link rel="stylesheet" href="../../styles/poster-event.css" />
-    <script type="module" src="../../scripts/api.js"></script>
-    <script type="module" src="../../scripts/http-api.js"></script>`,
+      <link rel="stylesheet" href="../../styles/poster-event.css" />
+      <script type="module" src="../../scripts/api.js"></script>
+      <script type="module" src="../../scripts/http-api.js"></script>`,
       pageModuleScripts: ['poster-event.js'],
       pageTemplates: [{ name: 'templates/post-event' }],
-    });
+    };
   }
 }

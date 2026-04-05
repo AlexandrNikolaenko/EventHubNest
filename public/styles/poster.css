@@ -141,3 +141,35 @@ input:focus {
   animation-iteration-count: infinite;
   animation-duration: 2s;
 }
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.pagination-controls button {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  color: var(--primary);
+}
+
+.pagination-controls button:hover {
+  color: var(--primary-contrast-text);
+}
+
+.pagination-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-controls select {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 6px;
+}
+

@@ -207,6 +207,23 @@ export default class Api {
     });
   }
 
+  async getReviews(onSuccess, onError, query = '') {
+    return await this.#httpRequest.get({
+      query: '/reviews' + query,
+      onSuccess,
+      onError,
+    });
+  }
+
+  async createReview(onSuccess, onError, body) {
+    return await this.#httpRequest.post({
+      query: '/reviews',
+      onSuccess,
+      onError,
+      body,
+    });
+  }
+
   async login({ email, password }, onSuccess, onError) {
     return await this.#httpRequest.post({
       body: { email, password },

@@ -38,3 +38,77 @@ section {
     flex-direction: column;
   }
 }
+
+/* Reviews section styling */
+.reviews-wrapper {
+  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+
+.reviews-content {
+  width: 100%;
+  display: flex;
+  gap: 20px;
+}
+
+@media screen and (max-width: 768px) {
+  .reviews-content {
+    flex-direction: column;
+  }
+}
+
+.review-form {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.review-form textarea,
+.review-form input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.review-form button {
+  width: fit-content;
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.review-item {
+  border: 1px solid #e2e2e2;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fff;
+}
+
+.review-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.review-meta strong {
+  font-weight: 600;
+}
+
+.review-meta span {
+  font-size: 0.85rem;
+  color: #666;
+}
+

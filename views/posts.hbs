@@ -11,6 +11,18 @@
     </button>
   </form>
 </section>
+<section class='pagination-controls wrapper'>
+  <button id='prev-page' class='secondary' disabled>Назад</button>
+  <span id='current-page'>Страница 1</span>
+  <button id='next-page' class='secondary'>Вперед</button>
+  <label for='page-size'>На странице:</label>
+  <select id='page-size'>
+    <option value='5'>5</option>
+    <option value='10' selected>10</option>
+    <option value='20'>20</option>
+    <option value='50'>50</option>
+  </select>
+</section>
 <section id='poster-section'>
   <span id='query-error' class='h6 hide'></span>
   <div id='poster__empty' class='hide poster__empty'>
