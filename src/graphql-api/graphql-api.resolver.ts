@@ -247,7 +247,7 @@ export class GraphqlApiResolver {
   ) {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      select: { id: true, name: true, email: true },
+      select: { id: true, name: true, email: true, avatar: true },
     });
 
     if (!user) {
@@ -564,7 +564,7 @@ export class PostFieldsResolver {
   author(@Parent() post: PostModel) {
     return this.prisma.user.findUnique({
       where: { id: post.authorId },
-      select: { id: true, name: true, email: true },
+      select: { id: true, name: true, email: true, avatar: true },
     });
   }
 
@@ -608,7 +608,7 @@ export class EventFieldsResolver {
   author(@Parent() event: EventModel) {
     return this.prisma.user.findUnique({
       where: { id: event.authorId },
-      select: { id: true, name: true, email: true },
+      select: { id: true, name: true, email: true, avatar: true },
     });
   }
 
@@ -638,12 +638,13 @@ export class EventFieldsResolver {
       take: params.limit,
       include: {
         user: {
-          select: { id: true, name: true, email: true },
+          select: { id: true, name: true, email: true, avatar: true },
         },
       },
       orderBy: { id: 'asc' },
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return registrations.map((registration) => registration.user);
   }
 }
@@ -659,7 +660,7 @@ export class ReviewFieldsResolver {
   author(@Parent() review: ReviewModel) {
     return this.prisma.user.findUnique({
       where: { id: review.authorId },
-      select: { id: true, name: true, email: true },
+      select: { id: true, name: true, email: true, avatar: true },
     });
   }
 
@@ -685,7 +686,7 @@ export class NotificationFieldsResolver {
   user(@Parent() notification: NotificationModel) {
     return this.prisma.user.findUnique({
       where: { id: notification.userId },
-      select: { id: true, name: true, email: true },
+      select: { id: true, name: true, email: true, avatar: true },
     });
   }
 }

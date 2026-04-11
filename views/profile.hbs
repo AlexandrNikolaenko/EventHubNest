@@ -1,0 +1,58 @@
+<section class='profile wrapper'>
+  <div class='profile-heading'>
+    <div>
+      <p class='body1'>Личный кабинет</p>
+      <h2 id='profile-name'>Профиль</h2>
+    </div>
+    <a href='/events'>
+      <button class='primary outline'>К событиям</button>
+    </a>
+  </div>
+
+  <div id='profile-error' class='profile-message hide'></div>
+
+  <section class='profile-grid'>
+    <article class='profile-panel'>
+      <h3>Пользователь</h3>
+      <div class='avatar-box'>
+        <img id='profile-avatar' src='/default.png' alt='Аватар пользователя' />
+      </div>
+      <dl class='profile-data'>
+        <div>
+          <dt>ID</dt>
+          <dd id='profile-id'>...</dd>
+        </div>
+        <div>
+          <dt>Имя</dt>
+          <dd id='profile-user-name'>...</dd>
+        </div>
+        <div>
+          <dt>Email</dt>
+          <dd id='profile-email'>...</dd>
+        </div>
+      </dl>
+      <form id='avatar-form' class='avatar-form'>
+        <label for='avatar-input' class='body1'>Новый аватар</label>
+        <input
+          id='avatar-input'
+          name='avatar'
+          type='file'
+          accept='image/png,image/jpeg,image/webp'
+          required
+        />
+        <button class='primary' type='submit'>Обновить аватар</button>
+      </form>
+    </article>
+
+    <article class='profile-panel notifications-panel'>
+      <div class='panel-header'>
+        <h3>Уведомления</h3>
+        <button id='refresh-notifications' class='secondary'>Обновить</button>
+      </div>
+      <div id='notifications-empty' class='profile-message hide'>
+        Уведомлений пока нет.
+      </div>
+      <ul id='notifications-list' class='notifications-list'></ul>
+    </article>
+  </section>
+</section>

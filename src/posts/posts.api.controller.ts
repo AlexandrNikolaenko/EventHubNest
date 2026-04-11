@@ -10,13 +10,16 @@ import {
   ParseIntPipe,
   Query,
   Res,
+  Header,
+  UseInterceptors,
 } from '@nestjs/common';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Observable } from 'rxjs';
 import { MessageEvent } from '@nestjs/common';
-import express from 'express';
+import type { Response } from 'express';
 import {
   ApiTags,
   ApiOperation,
@@ -68,6 +71,9 @@ export class ApiPostsController {
   }
 
   @Get()
+  @Header('Cache-Control', 'private, max-age=3600, must-revalidate')
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(5000)
   @ApiOperation({ summary: 'Get posts list with pagination' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
@@ -83,7 +89,7 @@ export class ApiPostsController {
     @Query('page', ParseIntPipe) page = 1,
     @Query('limit', ParseIntPipe) limit = 10,
     @Query('search') search = '',
-    @Res() res: express.Response,
+    @Res({ passthrough: true }) res: Response,
   ) {
     const pageNum = page;
     const limitNum = limit > 50 ? 50 : limit; // ограничение на максимум 50 записей за запрос
@@ -108,10 +114,13 @@ export class ApiPostsController {
       res.setHeader('Link', links.join(', '));
     }
 
-    return res.json(data);
+    return data;
   }
 
   @Get(':id')
+  @Header('Cache-Control', 'private, max-age=3600, must-revalidate')
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(5000)
   @ApiOperation({ summary: 'Get post by id' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({ status: 200, description: 'Post data', type: CreatePostDto })

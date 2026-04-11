@@ -11,6 +11,9 @@ export class UserModel {
   @Field({ description: 'User email address.' })
   email!: string;
 
+  @Field({ description: 'User avatar URL or local path.' })
+  avatar!: string;
+
   @Field(() => [PostModel], {
     description: 'Posts created by this user.',
     nullable: true,

@@ -484,6 +484,9 @@ type UserModel {
     page: Int! = 1
   ): [EventModel!]
 
+  """User avatar URL or local path."""
+  avatar: String!
+
   """User email address."""
   email: String!
 

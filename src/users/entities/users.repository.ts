@@ -10,6 +10,7 @@ export class UsersRepository {
         id: true,
         name: true,
         email: true,
+        avatar: true,
       },
     });
   }
@@ -26,8 +27,22 @@ export class UsersRepository {
         id: true,
         name: true,
         email: true,
+        avatar: true,
       },
       take: 10, // лимит для autocomplete
+    });
+  }
+
+  async updateAvatar(id: number, avatar: string) {
+    return this.prisma.user.update({
+      where: { id },
+      data: { avatar },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        avatar: true,
+      },
     });
   }
 }

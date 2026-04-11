@@ -22,4 +22,10 @@ export class UsersService {
 
     return user;
   }
+
+  async updateAvatar(id: number, avatar: string) {
+    await this.findOne(id);
+
+    return this.repository.updateAvatar(id, avatar);
+  }
 }

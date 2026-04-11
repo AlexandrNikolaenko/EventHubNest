@@ -7,17 +7,18 @@ class HttpRequest {
 
   async #request({ method, query, body, onSuccess, onError }) {
     let payload;
+    const isFormData = body instanceof FormData;
 
     try {
       const res = await fetch(this.#api_host.concat(query), {
         method,
-        cache: 'no-cache',
-        headers: body
+        cache: method === 'GET' ? 'default' : 'no-store',
+        headers: body && !isFormData
           ? {
               'Content-Type': 'application/json',
             }
           : undefined,
-        body: body ? JSON.stringify(body) : undefined,
+        body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,
       });
 
       const text = await res.text();
@@ -214,6 +215,15 @@ export default class Api {
   async deleteNotification(onSuccess, onError, id, userId) {
     return await this.#httpRequest.delete({
       query: `/notifications/${id}${params({ userId })}`,
+      onSuccess,
+      onError,
+    });
+  }
+
+  async updateAvatar(onSuccess, onError, id, formData) {
+    return await this.#httpRequest.patch({
+      query: `/users/${id}/avatar`,
+      body: formData,
       onSuccess,
       onError,
     });
