@@ -8,5 +8,6 @@ import { ApiPostsController } from './posts.api.controller';
   imports: [PrismaModule],
   controllers: [PostsController, ApiPostsController],
   providers: [PostsService],
+  exports: [PostsService],
 })
 export class PostsModule {}

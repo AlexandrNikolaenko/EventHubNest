@@ -24,7 +24,10 @@ export class EventsService {
     if (!userId || typeof userId !== 'number' || isNaN(userId)) {
       throw new ForbiddenException('UserId is required');
     }
-    return this.repository.findAll(userId, page, limit);
+    const pageNum = Math.max(1, page);
+    const limitNum = Math.min(Math.max(1, limit), 50);
+
+    return this.repository.findAll(userId, (pageNum - 1) * limitNum, limitNum);
   }
 
   async findOne(id: number) {

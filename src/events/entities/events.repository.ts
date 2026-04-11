@@ -132,13 +132,19 @@ export class EventsRepository {
       throw new ForbiddenException('Author not found');
     }
 
-    const users = await this.prisma.user.findMany({
-      where: {
-        email: {
-          in: dto.users,
-        },
-      },
-    });
+    const users = dto.users
+      ? await this.prisma.user.findMany({
+          where: {
+            email: {
+              in: dto.users,
+            },
+          },
+        })
+      : [];
+
+    if (dto.users && users.length !== dto.users.length) {
+      throw new NotFoundException('Some users not found');
+    }
 
     return this.prisma.event.update({
       where: { id: eventId },
@@ -148,11 +154,27 @@ export class EventsRepository {
         place: dto.place,
         date: dto.date ? new Date(dto.date) : undefined,
 
+        registrations: dto.users
+          ? {
+              deleteMany: {},
+              create: users.map((user) => ({
+                userId: user.id,
+              })),
+            }
+          : undefined,
+      },
+      include: {
+        author: true,
         registrations: {
-          deleteMany: {},
-          create: users.map((user) => ({
-            userId: user.id,
-          })),
+          include: {
+            user: {
+              select: {
+                id: true,
+                email: true,
+                name: true,
+              },
+            },
+          },
         },
       },
     });

@@ -45,8 +45,11 @@ export class NotificationsService {
     return notification;
   }
 
-  async findAll(userId: number) {
-    return this.repository.findAll(userId);
+  async findAll(userId: number, page = 1, limit = 10) {
+    const pageNum = Math.max(1, page);
+    const limitNum = Math.min(Math.max(1, limit), 50);
+
+    return this.repository.findAll(userId, (pageNum - 1) * limitNum, limitNum);
   }
 
   async findOne(id: number) {

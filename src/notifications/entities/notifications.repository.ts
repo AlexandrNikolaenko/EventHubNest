@@ -25,9 +25,11 @@ export class NotificationsRepository {
     });
   }
 
-  async findAll(userId: number) {
+  async findAll(userId: number, skip = 0, take = 10) {
     return await this.prisma.notification.findMany({
       where: { userId },
+      skip,
+      take,
       orderBy: { createdAt: 'desc' },
     });
   }

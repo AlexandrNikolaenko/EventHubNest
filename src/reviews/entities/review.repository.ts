@@ -35,11 +35,16 @@ export class ReviewsRepository {
     });
   }
 
-  async findAll() {
+  async findAll(skip = 0, take = 10) {
     return await this.prisma.review.findMany({
       include: {
         author: true,
         post: true,
+      },
+      skip,
+      take,
+      orderBy: {
+        createdAt: 'desc',
       },
     });
   }

@@ -10,6 +10,13 @@ import { Request, Response } from 'express';
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
+    // Для GraphQL и других не-HTTP контекстов
+    // не пытаемся работать как с express request/response
+    const contextType = host.getType();
+    if (contextType !== 'http') {
+      throw exception;
+    }
+
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();

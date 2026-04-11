@@ -19,8 +19,11 @@ export class ReviewsService {
     return await this.repository.create(dto);
   }
 
-  async findAll() {
-    return await this.repository.findAll();
+  async findAll(page = 1, limit = 10) {
+    const pageNum = Math.max(1, page);
+    const limitNum = Math.min(Math.max(1, limit), 50);
+
+    return await this.repository.findAll((pageNum - 1) * limitNum, limitNum);
   }
 
   async findOne(id: number) {
