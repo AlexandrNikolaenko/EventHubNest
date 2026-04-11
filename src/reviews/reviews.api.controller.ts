@@ -43,14 +43,25 @@ export class ReviewsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all reviews' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  @ApiQuery({ name: 'postId', required: false, type: Number })
   @ApiResponse({
     status: 200,
     description: 'Review list',
     type: CreateReviewDto,
     isArray: true,
   })
-  findAll() {
-    return this.reviewsService.findAll();
+  findAll(
+    @Query('page') page = '1',
+    @Query('limit') limit = '10',
+    @Query('postId') postId?: string,
+  ) {
+    return this.reviewsService.findAll(
+      Number(page),
+      Number(limit),
+      postId ? Number(postId) : undefined,
+    );
   }
 
   @Get(':id')
@@ -89,9 +100,13 @@ export class ReviewsController {
   @Delete(':id')
   @ApiOperation({ summary: 'Delete review' })
   @ApiParam({ name: 'id', type: Number })
+  @ApiQuery({ name: 'userId', required: false, type: Number })
   @ApiNoContentResponse({ description: 'Review deleted' })
   @ApiNotFoundResponse({ description: 'Review not found' })
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.reviewsService.remove(id);
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('userId') userId?: string,
+  ) {
+    return this.reviewsService.remove(id, userId ? Number(userId) : undefined);
   }
 }

@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -19,11 +20,15 @@ export class ReviewsService {
     return await this.repository.create(dto);
   }
 
-  async findAll(page = 1, limit = 10) {
+  async findAll(page = 1, limit = 10, postId?: number) {
     const pageNum = Math.max(1, page);
     const limitNum = Math.min(Math.max(1, limit), 50);
 
-    return await this.repository.findAll((pageNum - 1) * limitNum, limitNum);
+    return await this.repository.findAll(
+      (pageNum - 1) * limitNum,
+      limitNum,
+      postId,
+    );
   }
 
   async findOne(id: number) {
@@ -50,7 +55,7 @@ export class ReviewsService {
     return await this.repository.update(id, userId, dto);
   }
 
-  async remove(id: number) {
+  async remove(id: number, userId?: number) {
     if (isNaN(Number(id))) {
       throw new BadRequestException('Id should be integer');
     }
@@ -58,6 +63,9 @@ export class ReviewsService {
 
     if (!review) {
       throw new NotFoundException('Review not found');
+    }
+    if (userId && review.authorId !== userId) {
+      throw new ForbiddenException('Author not found');
     }
     return await this.repository.remove(id);
   }

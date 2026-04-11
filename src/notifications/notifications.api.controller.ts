@@ -74,6 +74,8 @@ export class NotificationsController {
   @Get()
   @ApiOperation({ summary: 'Get notifications by user id' })
   @ApiQuery({ name: 'userId', required: true, type: Number })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
   @ApiResponse({
     status: 200,
     description: 'Notifications list',
@@ -81,8 +83,16 @@ export class NotificationsController {
     isArray: true,
   })
   @ApiNotFoundResponse({ description: 'User not found or no notifications' })
-  findAll(@Query('userId', ParseIntPipe) userId: number) {
-    return this.notificationsService.findAll(userId);
+  findAll(
+    @Query('userId', ParseIntPipe) userId: number,
+    @Query('page') page = '1',
+    @Query('limit') limit = '10',
+  ) {
+    return this.notificationsService.findAll(
+      userId,
+      Number(page),
+      Number(limit),
+    );
   }
 
   @Get(':id')

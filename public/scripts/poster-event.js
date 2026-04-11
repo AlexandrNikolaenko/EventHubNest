@@ -2,6 +2,7 @@ import Api from './http-api.js';
 
 const eventId = Number(document.location.pathname.split('/')[2]);
 const api = new Api();
+let editingReviewId = null;
 
 function getCurrentUserId() {
   const id = window.localStorage.getItem('activeUser');
@@ -31,10 +32,13 @@ function renderEvent(data) {
   const postTemplate = document.getElementById('post-template').content;
   const post = postTemplate.cloneNode(true);
 
-  post.querySelector('.post-media').style.backgroundImage = `url(${data.image})`;
+  post.querySelector('.post-media').style.backgroundImage =
+    `url(${data.image})`;
   post.querySelector('h6').textContent = data.title;
   post.querySelector('p').textContent = data.desc;
-  post.querySelector('.date').textContent = new Date(data.date).toLocaleDateString('ru-RU');
+  post.querySelector('.date').textContent = new Date(
+    data.date,
+  ).toLocaleDateString('ru-RU');
   post.querySelector('.place').textContent = data.place;
 
   section.appendChild(post);
@@ -43,27 +47,28 @@ function renderEvent(data) {
 function loadReviews() {
   api.getReviews(
     (reviews) => {
-      const postReviews = Array.isArray(reviews)
-        ? reviews.filter((r) => r.postId === eventId)
-        : [];
-      renderReviews(postReviews);
+      renderReviews(Array.isArray(reviews) ? reviews : []);
     },
     (err) => {
       console.error('Reviews load error', err);
       const reviewsContainer = document.getElementById('reviews-list');
       if (reviewsContainer) {
-        reviewsContainer.innerHTML = '<p class="body1">Не удалось загрузить отзывы.</p>';
+        reviewsContainer.innerHTML =
+          '<p class="body1">Не удалось загрузить отзывы.</p>';
       }
     },
+    `?postId=${eventId}&limit=50`,
   );
 }
 
 function renderReviews(reviews) {
   const reviewsContainer = document.getElementById('reviews-list');
   if (!reviewsContainer) return;
+  const currentUserId = getCurrentUserId();
 
   if (!reviews.length) {
-    reviewsContainer.innerHTML = '<p class="body1">Пока нет отзывов о событии.</p>';
+    reviewsContainer.innerHTML =
+      '<p class="body1">Пока нет отзывов о событии.</p>';
     return;
   }
 
@@ -74,16 +79,125 @@ function renderReviews(reviews) {
     const author = review.author?.email || 'Аноним';
     const rating = review.rating ? ` Рейтинг: ${review.rating}/5` : '';
 
-    reviewElem.innerHTML = `
-      <div class="review-meta">
-        <strong>${author}</strong><span>${new Date(review.createdAt).toLocaleString('ru-RU')}</span>
-      </div>
-      <p class="body1">${review.content}</p>
-      <p class="body2">${rating}</p>
-    `;
+    const meta = document.createElement('div');
+    meta.className = 'review-meta';
+
+    const authorElem = document.createElement('strong');
+    authorElem.textContent = author;
+
+    const dateElem = document.createElement('span');
+    dateElem.textContent = new Date(review.createdAt).toLocaleString('ru-RU');
+
+    const contentElem = document.createElement('p');
+    contentElem.className = 'body1';
+    contentElem.textContent = review.content;
+
+    const ratingElem = document.createElement('p');
+    ratingElem.className = 'body2';
+    ratingElem.textContent = rating;
+
+    meta.append(authorElem, dateElem);
+    reviewElem.append(meta, contentElem, ratingElem);
+
+    if (currentUserId && review.authorId === currentUserId) {
+      const actions = document.createElement('div');
+      actions.className = 'review-actions';
+
+      const editButton = document.createElement('button');
+      editButton.className = 'secondary';
+      editButton.textContent = 'Редактировать';
+      editButton.addEventListener('click', () => openEditReviewModal(review));
+
+      const deleteButton = document.createElement('button');
+      deleteButton.className = 'error';
+      deleteButton.textContent = 'Удалить';
+      deleteButton.addEventListener('click', () => deleteReview(review.id));
+
+      actions.append(editButton, deleteButton);
+      reviewElem.appendChild(actions);
+    }
 
     reviewsContainer.appendChild(reviewElem);
   });
+}
+
+function showSuccess(message) {
+  if (window.toastr) toastr.success(message);
+  else alert(message);
+}
+
+function showFailure(message) {
+  if (window.toastr) toastr.error(message);
+  else alert(message);
+}
+
+function openEditReviewModal(review) {
+  editingReviewId = review.id;
+  document.getElementById('edit-review-content').value = review.content;
+  document.getElementById('edit-review-rating').value = review.rating || '';
+  document.getElementById('edit-review-modal').classList.add('active');
+}
+
+function closeEditReviewModal(e) {
+  e.preventDefault();
+  editingReviewId = null;
+  document.getElementById('edit-review-form').reset();
+  document.getElementById('edit-review-modal').classList.remove('active');
+}
+
+function handleEditReviewSubmit(e) {
+  e.preventDefault();
+
+  const authorId = getCurrentUserId();
+  const content = document.getElementById('edit-review-content').value.trim();
+  const ratingInput = document.getElementById('edit-review-rating').value;
+  const rating = ratingInput ? Number(ratingInput) : undefined;
+
+  if (!editingReviewId || !authorId) {
+    showFailure('Войдите, чтобы редактировать отзыв.');
+    return;
+  }
+
+  if (!content) {
+    showFailure('Напишите текст отзыва.');
+    return;
+  }
+
+  api.updateReview(
+    () => {
+      showSuccess('Отзыв обновлен');
+      document.getElementById('edit-review-modal').classList.remove('active');
+      document.getElementById('edit-review-form').reset();
+      editingReviewId = null;
+      loadReviews();
+    },
+    () => showFailure('Не удалось обновить отзыв'),
+    editingReviewId,
+    authorId,
+    {
+      content,
+      rating,
+    },
+  );
+}
+
+function deleteReview(id) {
+  const authorId = getCurrentUserId();
+
+  if (!authorId) {
+    showFailure('Войдите, чтобы удалить отзыв.');
+    return;
+  }
+
+  api.deleteReview(
+    () => {
+      showSuccess('Отзыв удален');
+      loadReviews();
+    },
+    () => showFailure('Не удалось удалить отзыв'),
+    id,
+    authorId,
+  );
 }
 
 function handleError(e) {
@@ -109,12 +223,12 @@ function handleReviewSubmit(e) {
   const authorId = getCurrentUserId();
 
   if (!authorId) {
-    alert('Пожалуйста, войдите, чтобы оставить отзыв.');
+    showFailure('Пожалуйста, войдите, чтобы оставить отзыв.');
     return;
   }
 
   if (!content) {
-    alert('Пожалуйста, напишите текст отзыва.');
+    showFailure('Пожалуйста, напишите текст отзыва.');
     return;
   }
 
@@ -126,14 +240,14 @@ function handleReviewSubmit(e) {
   };
 
   api.createReview(
-    (saved) => {
+    () => {
       document.getElementById('review-form').reset();
       loadReviews();
-      alert('Отзыв успешно добавлен!');
+      showSuccess('Отзыв успешно добавлен!');
     },
     (err) => {
       console.error('Review create error', err);
-      alert('Не удалось добавить отзыв. Попробуйте позже.');
+      showFailure('Не удалось добавить отзыв. Попробуйте позже.');
     },
     newReview,
   );
@@ -147,3 +261,9 @@ function initReviewForm() {
 
 loadEvent();
 initReviewForm();
+document
+  .getElementById('edit-review-form')
+  .addEventListener('submit', handleEditReviewSubmit);
+document
+  .getElementById('close-edit-review-modal')
+  .addEventListener('click', closeEditReviewModal);

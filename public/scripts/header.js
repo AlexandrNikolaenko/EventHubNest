@@ -14,7 +14,9 @@ Array.from(links).forEach((link) => {
     ((page == '/about/' || page == '/about') &&
       link.getAttribute('href') == '/about') ||
     ((page == '/posts/' || page == '/posts') &&
-      link.getAttribute('href') == '/posts')
+      link.getAttribute('href') == '/posts') ||
+    ((page == '/profile/' || page == '/profile') &&
+      link.getAttribute('href') == '/profile')
   ) {
     link.classList.add('active');
   }
@@ -28,7 +30,9 @@ Array.from(navBarLinks).forEach((link) => {
     ((page == '/about/' || page == '/about') &&
       link.getAttribute('href') == '/about') ||
     ((page == '/posts/' || page == '/posts') &&
-      link.getAttribute('href') == '/posts')
+      link.getAttribute('href') == '/posts') ||
+    ((page == '/profile/' || page == '/profile') &&
+      link.getAttribute('href') == '/profile')
   ) {
     link.classList.add('active');
   }

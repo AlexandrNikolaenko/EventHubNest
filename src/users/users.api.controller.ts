@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import {
   ApiTags,
@@ -32,5 +32,17 @@ export class UsersApiController {
   @ApiNotFoundResponse({ description: 'No users found' })
   searchUsers(@Query('email') email: string) {
     return this.usersService.searchByEmail(email);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get user by id' })
+  @ApiResponse({
+    status: 200,
+    description: 'User data',
+    type: Object,
+  })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.usersService.findOne(id);
   }
 }

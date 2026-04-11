@@ -112,3 +112,55 @@ section {
   color: #666;
 }
 
+.review-actions,
+.review-edit-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.review-actions button,
+.review-edit-actions button {
+  padding: 6px 14px;
+}
+
+#edit-review-modal {
+  z-index: 101;
+  display: none;
+  position: fixed;
+  inset: 0;
+  justify-content: center;
+  align-items: start;
+  overflow-y: auto;
+  background-color: rgba(96, 125, 139, 0.25);
+}
+
+#edit-review-modal.active {
+  display: flex;
+}
+
+.review-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 420px;
+  width: 100%;
+  margin: 60px 20px 100px;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: white;
+  filter: var(--shadow-light);
+}
+
+.review-edit-form h3 {
+  margin: 0;
+}
+
+.review-edit-form textarea,
+.review-edit-form input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}

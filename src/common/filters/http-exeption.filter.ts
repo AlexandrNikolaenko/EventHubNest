@@ -32,10 +32,18 @@ export class HttpExceptionFilter implements ExceptionFilter {
     // Если это стандартная ошибка Nest (400, 403, 500)
     if (exception instanceof HttpException) {
       const status = exception.getStatus();
+      const exceptionResponse = exception.getResponse();
+
+      if (typeof exceptionResponse === 'object') {
+        return response.status(status).json({
+          statusCode: status,
+          ...exceptionResponse,
+        });
+      }
 
       return response.status(status).json({
         statusCode: status,
-        message: exception.message,
+        message: exceptionResponse,
       });
     }
 

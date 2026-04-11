@@ -71,6 +71,7 @@ export class ApiPostsController {
   @ApiOperation({ summary: 'Get posts list with pagination' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  @ApiQuery({ name: 'search', required: false, type: String })
   @ApiResponse({
     status: 200,
     description: 'List of posts',
@@ -81,12 +82,13 @@ export class ApiPostsController {
   async findAll(
     @Query('page', ParseIntPipe) page = 1,
     @Query('limit', ParseIntPipe) limit = 10,
+    @Query('search') search = '',
     @Res() res: express.Response,
   ) {
     const pageNum = page;
     const limitNum = limit > 50 ? 50 : limit; // ограничение на максимум 50 записей за запрос
 
-    const data = await this.postsService.findAll(pageNum, limitNum);
+    const data = await this.postsService.findAll(pageNum, limitNum, search);
 
     // HATEOAS links
     const prevPage = pageNum > 1 ? pageNum - 1 : null;

@@ -1,367 +1,357 @@
-import { store, user } from './api.js';
+import { user } from './api.js';
 import Api from './http-api.js';
 
 if (!user.getUser().id) window.location.assign('/auth/login');
+
 const api = new Api();
+const currentUserId = Number(user.getUser().id);
+let selectedUsers = [];
+let loadedEvents = [];
+let viewMode = 'list';
 
 const eventSource = new EventSource(
-  `/api/notifications/events?userId=${Number(user.getUser().id)}`,
+  `/api/notifications/events?userId=${currentUserId}`,
 );
 
 eventSource.onmessage = function (event) {
   const data = JSON.parse(event.data);
 
-  if (data.type === 'notification') {
+  if (data.type === 'notification' && window.toastr) {
     toastr.success(data.notification.message);
-
-    // можно обновить список уведомлений
-    // loadNotifications();
   }
 };
 
-function handleChangeVision(param) {
-  if (param == 'list') {
-    document.getElementById('events-list').classList.remove('hide');
-    document.getElementById('events-table').classList.add('hide');
-  } else {
-    document.getElementById('events-list').classList.add('hide');
-    document.getElementById('events-table').classList.remove('hide');
-  }
-  if (store.getEvents().length == 0) {
-    document.getElementById('events-list').classList.add('hide');
-    document.getElementById('events-table').classList.add('hide');
-    document.getElementById('events__empty').classList.remove('hide');
-  }
+function byId(id) {
+  return document.getElementById(id);
 }
 
-document
-  .getElementById('by-list')
-  .addEventListener('click', () => handleChangeVision('list'));
-document
-  .getElementById('by-table')
-  .addEventListener('click', () => handleChangeVision('table'));
+function bind(id, event, handler) {
+  const element = byId(id);
+  if (element) element.addEventListener(event, handler);
+}
+
+function showMessage(id, text) {
+  const element = byId(id);
+  if (!element) return;
+  element.textContent = text;
+  element.classList.remove('hide');
+}
+
+function getAuthorEmail(event) {
+  return event.author?.email || `user #${event.authorId}`;
+}
+
+function getEventImage(event) {
+  return event.image || '/images/theatre.jpg';
+}
+
+function updateVisibility() {
+  const list = byId('events-list');
+  const table = byId('events-table');
+  const empty = byId('events__empty');
+
+  if (!list || !table || !empty) return;
+
+  const hasEvents = loadedEvents.length > 0;
+  empty.classList.toggle('hide', hasEvents);
+  list.classList.toggle('hide', !hasEvents || viewMode !== 'list');
+  table.classList.toggle('hide', !hasEvents || viewMode !== 'table');
+}
+
+function renderEvents(events) {
+  loadedEvents = events;
+
+  const list = byId('events-list');
+  const tableBody = byId('events-table-body');
+  if (!list || !tableBody) return;
+
+  list.innerHTML = '';
+  tableBody.innerHTML = '';
+
+  if (!events.length) {
+    updateVisibility();
+    return;
+  }
+
+  const eventTemplate = byId('event-card-template').content;
+  const eventRowTemplate = byId('event-table-row-template').content;
+
+  events.forEach((event) => {
+    const eventCard = eventTemplate.cloneNode(true);
+    eventCard.querySelector('.card-media').style.background =
+      `url(${getEventImage(event)}) center / cover`;
+    eventCard.querySelector('.card-header').textContent = event.title;
+    eventCard.querySelector('.event-author').textContent =
+      getAuthorEmail(event);
+    eventCard.querySelector('.event-description').textContent = event.desc;
+    eventCard.querySelector('.event-date').textContent = new Date(
+      event.date,
+    ).toLocaleDateString('ru-RU');
+    eventCard.querySelector('.event-place').textContent = event.place;
+    eventCard
+      .querySelector('.event-button')
+      .setAttribute('href', `/events/${event.id}`);
+    eventCard
+      .querySelector('.remove-button')
+      .addEventListener('click', (e) => handleRemoveEvent(e, event.id));
+    eventCard
+      .querySelector('.edit-event-button')
+      .addEventListener('click', (e) => handleOpenEditModal(e, event.id));
+    list.appendChild(eventCard);
+
+    const eventRow = eventRowTemplate.cloneNode(true);
+    eventRow.querySelector('.cell-id').textContent = event.id;
+    eventRow.querySelector('.cell-title').textContent = event.title;
+    eventRow.querySelector('.cell-desc').textContent = event.desc;
+    eventRow.querySelector('.cell-author').textContent = getAuthorEmail(event);
+    eventRow.querySelector('.cell-date').textContent = new Date(
+      event.date,
+    ).toLocaleDateString('ru-RU');
+    eventRow.querySelector('.cell-place').textContent = event.place;
+    tableBody.appendChild(eventRow);
+  });
+
+  updateVisibility();
+}
+
+function handleLoadError(e) {
+  console.error(e);
+  showMessage('query-error', 'Server request failed.');
+}
+
+function loadEvents(search = '') {
+  api.getEvents(
+    (events) => {
+      const normalizedSearch = search.trim().toLowerCase();
+      const filteredEvents = normalizedSearch
+        ? events.filter((event) =>
+            event.title.toLowerCase().includes(normalizedSearch),
+          )
+        : events;
+
+      renderEvents(filteredEvents);
+    },
+    handleLoadError,
+    currentUserId,
+    { page: 1, limit: 50 },
+  );
+}
+
+function handleChangeVision(param) {
+  viewMode = param;
+  updateVisibility();
+}
+
+bind('by-list', 'click', () => handleChangeVision('list'));
+bind('by-table', 'click', () => handleChangeVision('table'));
 
 function handleRemoveEvent(e, id) {
   e.preventDefault();
-  // store.deleteEvents(id);
-
-  function handleSuccess() {
-    loadEvents();
-  }
-
-  function hanldeError(e) {
-    console.log(e);
-  }
-
-  api.deleteEvent(handleSuccess, hanldeError, id);
+  api.deleteEvent(() => loadEvents(), handleLoadError, id);
 }
-
-function loadEvents(search) {
-  // let events = store.getEvents();
-  api.getEvents(handleSuccess, handleError, user.getUser().id);
-
-  function handleError(e) {
-    const error = document.getElementById('query-error');
-    let message = ':(';
-    error.classList.remove('hide');
-    switch (e.message) {
-      case '500':
-        message = 'Сервер не отвечает' + message;
-      case '429':
-        message = 'К сожалению, вы были заблокированы' + message;
-    }
-  }
-
-  function handleSuccess(events) {
-    if (search) {
-      events = events.filter((event) => event.title.includes(search));
-    }
-
-    const list = document.getElementById('events-list');
-    const tableBody = document.getElementById('events-table-body');
-    const table = document.getElementById('events-table');
-    list.innerHTML = '';
-    tableBody.innerHTML = '';
-
-    if (events.length != 0) {
-      document.getElementById('events__empty').classList.add('hide');
-      list.classList.remove('hide');
-      const eventTemplate = document.getElementById(
-        'event-card-template',
-      ).content;
-      const eventRowTemplate = document.getElementById(
-        'event-table-row-template',
-      ).content;
-
-      events.forEach((event) => {
-        // добавляем списко карточек
-        const eventCard = eventTemplate.cloneNode(true);
-        eventCard.querySelector('.card-media').style.background =
-          `url(${event.image || '/images/theatre.jpg'})`;
-        eventCard.querySelector('.card-header').textContent = event.title;
-        eventCard.querySelector('.event-author').textContent =
-          event.author.email;
-        eventCard.querySelector('.event-description').textContent = event.desc;
-        eventCard.querySelector('.event-date').textContent = new Date(
-          event.date,
-        ).toLocaleDateString('ru-RU');
-        eventCard.querySelector('.event-place').textContent = event.place;
-        const link = eventCard.querySelector('.event-button');
-        link.setAttribute('href', `/events/${event.id}`);
-        eventCard
-          .querySelector('.remove-button')
-          .addEventListener('click', (e) => handleRemoveEvent(e, event.id));
-        eventCard
-          .querySelector('.edit-event-button')
-          .addEventListener('click', (e) => handleOpenEditModal(e, event.id));
-        list.appendChild(eventCard);
-
-        // добавляем таблицу событий
-        const eventRow = eventRowTemplate.cloneNode(true);
-        eventRow.querySelector('.cell-id').textContent = event.id;
-        eventRow.querySelector('.cell-title').textContent = event.title;
-        eventRow.querySelector('.cell-desc').textContent = event.desc;
-        eventRow.querySelector('.cell-author').textContent = event.author.email;
-        eventRow.querySelector('.cell-date').textContent = new Date(
-          event.date,
-        ).toLocaleDateString('ru-RU');
-        eventRow.querySelector('.cell-place').textContent = event.place;
-        tableBody.appendChild(eventRow);
-      });
-    } else {
-      list.classList.add('hide');
-      table.classList.add('hide');
-      document.getElementById('events__empty').classList.remove('hide');
-    }
-  }
-}
-
-loadEvents();
-
-// Поиск событий
 
 function handleSearch(e) {
   e.preventDefault();
   const formData = Object.fromEntries(new FormData(e.target));
-  loadEvents(formData.search);
+  loadEvents(formData.search || '');
 }
 
-document.getElementById('search-form').addEventListener('submit', handleSearch);
-
-// открытие и закрытие формы создания события
+bind('search-form', 'submit', handleSearch);
 
 function handleOpenCreatorModal(e) {
   e.preventDefault();
-  // document.getElementById('create-event-modal').classList.add('active');
   document.location.assign('/events/add');
 }
 
 function handleCloseCreatorModal(e) {
   e.preventDefault();
-  // document.getElementById('create-event-modal').classList.remove('active');
-  console.log('close');
   document.location.assign('/events');
 }
 
-document
-  .getElementById('close-cretor-modal')
-  .addEventListener('click', handleCloseCreatorModal);
+bind('close-cretor-modal', 'click', handleCloseCreatorModal);
 document
   .querySelector('.create-event')
-  .addEventListener('click', handleOpenCreatorModal);
-
-// открытие и закрытие формы генерации события
+  ?.addEventListener('click', handleOpenCreatorModal);
 
 function handleOpenGeneratorModal(e) {
   e.preventDefault();
-  document.getElementById('generate-event-modal').classList.add('active');
+  byId('generate-event-modal')?.classList.add('active');
 }
 
 function handleCloseGeneratorModal(e) {
   e.preventDefault();
-  document.getElementById('generate-event-modal').classList.remove('active');
+  byId('generate-event-modal')?.classList.remove('active');
 }
 
-document
-  .getElementById('close-generator-modal')
-  .addEventListener('click', handleCloseGeneratorModal);
+bind('close-generator-modal', 'click', handleCloseGeneratorModal);
 document
   .querySelector('.gen-event')
-  .addEventListener('click', handleOpenGeneratorModal);
-
-// открытие и закрытие формы редактирования события
+  ?.addEventListener('click', handleOpenGeneratorModal);
 
 function handleOpenEditModal(e, id) {
   e.preventDefault();
   document.location.assign('/events/' + id + '/edit');
-  // const form = document.getElementById('edit-event-form');
-  // const event = store.getEventById(id);
-  // form.dataset.id = id;
-  // console.log(e.target);
-  // form.querySelector('#edit-title').value = event.title;
-  // form.querySelector('#edit-desc').value = event.desc;
-  // form.querySelector('#edit-date').value = event.date;
-  // form.querySelector('#edit-place').value = event.place;
-  // document.getElementById('edit-event-modal').classList.add('active');
 }
 
 function handleCloseEditModal(e) {
   e.preventDefault();
-  document.getElementById('edit-event-modal').classList.remove('active');
+  byId('edit-event-modal')?.classList.remove('active');
 }
 
-document
-  .getElementById('close-edit-modal')
-  .addEventListener('click', handleCloseEditModal);
-
-// обработка формы создания события
-
-let users = [];
+bind('close-edit-modal', 'click', handleCloseEditModal);
 
 function setError(field) {
-  document.getElementById(field + '-error').classList.add('active');
+  byId(field + '-error')?.classList.add('active');
 }
 
 function clearErrors(keys) {
   keys.forEach((key) => {
-    document.getElementById(key + '-error').classList.remove('active');
+    byId(key + '-error')?.classList.remove('active');
   });
 }
 
 function validateFormCreate(event) {
-  const keys = Object.keys(event).filter((key) => key != 'users');
-  let errors = [];
-  keys.forEach((key) => {
-    if (event[key] == '') {
-      setError(key);
-      errors.push(key);
-    }
-  });
+  const keys = Object.keys(event).filter((key) => key !== 'users');
+  const errors = keys.filter((key) => event[key] === '');
+  errors.forEach(setError);
   clearErrors(keys.filter((key) => !errors.includes(key)));
-  if (errors.length == 0) return true;
-  else return false;
+  return errors.length === 0;
 }
 
 function handleCreateEvent(e) {
   e.preventDefault();
   const event = Object.fromEntries(new FormData(e.target));
-  if (validateFormCreate(event)) {
-    event.users = users;
-    store.setEvents(event);
-    users = [];
-    e.target.reset();
-    document.getElementById('users-active-list').innerHTML = '';
-    document.getElementById('users-list').classList.add('hide');
-    document.getElementById('create-event-modal').classList.remove('active');
-    loadEvents();
-  }
+
+  if (!validateFormCreate(event)) return;
+
+  api.createEvents(
+    () => {
+      selectedUsers = [];
+      e.target.reset();
+      byId('users-active-list').innerHTML = '';
+      byId('users-list').classList.add('hide');
+      byId('create-event-modal')?.classList.remove('active');
+      loadEvents();
+    },
+    handleLoadError,
+    {
+      authorId: currentUserId,
+      data: {
+        title: event.title,
+        desc: event.desc,
+        date: event.date,
+        place: event.place,
+        users: selectedUsers,
+      },
+    },
+  );
 }
 
-document
-  .getElementById('create-event-form')
-  .addEventListener('submit', handleCreateEvent);
-
-// выбор пользователей
+bind('create-event-form', 'submit', handleCreateEvent);
 
 function handleAddUser(e, email) {
   e.preventDefault();
 
-  const activeUsersList = document.getElementById('users-active-list');
+  if (selectedUsers.includes(email)) return;
 
-  const activeUserTemplate = document.getElementById(
-    'active-user-template',
-  ).content;
-
+  const activeUsersList = byId('users-active-list');
+  const activeUserTemplate = byId('active-user-template').content;
   const activeUser = activeUserTemplate.querySelector('li').cloneNode(true);
+
   activeUser.querySelector('span').textContent = email;
   activeUser.querySelector('button').addEventListener('click', (e) => {
     e.preventDefault();
     activeUsersList.removeChild(activeUser);
-    users = users.filter((elem) => elem != email);
+    selectedUsers = selectedUsers.filter((elem) => elem !== email);
   });
-  if (!Array.from(activeUsersList.childNodes).includes(activeUser)) {
-    activeUsersList.appendChild(activeUser);
-    users.push(email);
-  }
-  console.log(users);
+
+  activeUsersList.appendChild(activeUser);
+  selectedUsers.push(email);
 }
 
 function setUsers(search) {
-  const usersList = document.getElementById('users-list');
+  const usersList = byId('users-list');
   usersList.innerHTML = '';
-  let newUsers;
-  if (search)
-    newUsers = store.users
-      .filter((elem) => elem.email.includes(search))
-      .map((elem) => elem.email);
-  else newUsers = store.users.map((elem) => elem.email);
 
-  const userTemplate = document.getElementById('user-template').content;
+  api.searchUsers(
+    (users) => {
+      if (!users.length) {
+        usersList.classList.add('hide');
+        return;
+      }
 
-  newUsers.forEach((email) => {
-    const userBlock = userTemplate.cloneNode(true);
-    userBlock.querySelector('button').textContent = email;
-    userBlock
-      .querySelector('button')
-      .addEventListener('click', (e) => handleAddUser(e, email));
-    usersList.appendChild(userBlock);
-  });
+      const userTemplate = byId('user-template').content;
+      usersList.classList.remove('hide');
+      users.forEach(({ email }) => {
+        const userBlock = userTemplate.cloneNode(true);
+        userBlock.querySelector('button').textContent = email;
+        userBlock
+          .querySelector('button')
+          .addEventListener('click', (e) => handleAddUser(e, email));
+        usersList.appendChild(userBlock);
+      });
+    },
+    handleLoadError,
+    search,
+  );
 }
 
 function handleChangeUsersInput(e) {
-  const usersList = document.getElementById('users-list');
-  if (e.target.value != '') {
-    usersList.classList.remove('hide');
-    setUsers();
+  const usersList = byId('users-list');
+  if (e.target.value !== '') {
+    setUsers(e.target.value);
   } else {
     usersList.classList.add('hide');
-    usersList.innerHTML == '';
+    usersList.innerHTML = '';
   }
 }
 
-document
-  .getElementById('users')
-  .addEventListener('input', handleChangeUsersInput);
-
-// обработка формы редактирования события
+bind('users', 'input', handleChangeUsersInput);
 
 function setEditError(field) {
-  document.getElementById('edit-' + field + '-error').classList.add('active');
+  byId('edit-' + field + '-error')?.classList.add('active');
 }
 
 function clearEditErrors(keys) {
   keys.forEach((key) => {
-    document
-      .getElementById('edit-' + key + '-error')
-      .classList.remove('active');
+    byId('edit-' + key + '-error')?.classList.remove('active');
   });
 }
 
 function validateFormEdit(event) {
-  const keys = Object.keys(event).filter((key) => key != 'users');
-  let errors = [];
-  keys.forEach((key) => {
-    if (event[key] == '') {
-      setEditError(key);
-      errors.push(key);
-    }
-  });
+  const keys = Object.keys(event).filter((key) => key !== 'users');
+  const errors = keys.filter((key) => event[key] === '');
+  errors.forEach(setEditError);
   clearEditErrors(keys.filter((key) => !errors.includes(key)));
-  if (errors.length == 0) return true;
-  else return false;
+  return errors.length === 0;
 }
 
 function handleEditEvent(e) {
   e.preventDefault();
   const event = Object.fromEntries(new FormData(e.target));
-  if (validateFormEdit(event)) {
-    store.editEvent(e.target.dataset.id, event);
-    e.target.reset();
-    document.getElementById('edit-event-modal').classList.remove('active');
-    loadEvents();
-  }
+
+  if (!validateFormEdit(event)) return;
+
+  api.editEvent(
+    () => {
+      e.target.reset();
+      byId('edit-event-modal')?.classList.remove('active');
+      loadEvents();
+    },
+    handleLoadError,
+    {
+      authorId: currentUserId,
+      dto: {
+        title: event.title,
+        desc: event.desc,
+        date: event.date,
+        place: event.place,
+      },
+    },
+    e.target.dataset.id,
+  );
 }
 
-document
-  .getElementById('edit-event-form')
-  .addEventListener('submit', handleEditEvent);
+bind('edit-event-form', 'submit', handleEditEvent);
+
+loadEvents();

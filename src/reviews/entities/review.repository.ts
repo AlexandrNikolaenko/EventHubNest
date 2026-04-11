@@ -35,8 +35,9 @@ export class ReviewsRepository {
     });
   }
 
-  async findAll(skip = 0, take = 10) {
+  async findAll(skip = 0, take = 10, postId?: number) {
     return await this.prisma.review.findMany({
+      where: postId ? { postId } : undefined,
       include: {
         author: true,
         post: true,

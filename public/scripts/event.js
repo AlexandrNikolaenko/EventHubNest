@@ -1,8 +1,7 @@
-import { store } from './api.js';
+import { user } from './api.js';
 import Api from './http-api.js';
 
 const eventId = Number(document.location.pathname.split('/')[2]);
-console.log(document.location.pathname.split('/')[1]);
 
 const api = new Api();
 
@@ -22,14 +21,15 @@ function loadEvent() {
       event.date,
     ).toLocaleDateString('ru-RU');
     section.querySelector('.place').textContent = event.place;
-    section.querySelector('.author').textContent = event.author.email;
+    section.querySelector('.author').textContent =
+      event.author?.email || `user #${event.authorId}`;
 
     const usersList = document.getElementById('users-list');
     usersList.innerHTML = '';
     const userTemplate = document.getElementById('user-template').content;
-    event.registrations.forEach((elem) => {
+    (event.registrations || []).forEach((elem) => {
       const user = userTemplate.querySelector('li').cloneNode(true);
-      user.textContent = elem.user.email;
+      user.textContent = elem.user?.email || `user #${elem.userId}`;
       usersList.appendChild(user);
     });
   }
@@ -45,15 +45,7 @@ document
 
 function handleOpenEditModal(e) {
   e.preventDefault();
-  console.log(e);
   document.location.assign('/events/' + eventId + '/edit');
-  // const form = document.getElementById('edit-event-form');
-
-  // form.querySelector('#edit-title').value = event.title;
-  // form.querySelector('#edit-desc').value = event.desc;
-  // form.querySelector('#edit-date').value = event.date;
-  // form.querySelector('#edit-place').value = event.place;
-  // document.getElementById('edit-event-modal').classList.add('active');
 }
 
 function handleCloseEditModal(e) {
@@ -97,10 +89,19 @@ function handleEditEvent(e) {
   e.preventDefault();
   const event = Object.fromEntries(new FormData(e.target));
   if (validateFormEdit(event)) {
-    store.editEvent(eventId, event);
-    e.target.reset();
-    document.getElementById('edit-event-modal').classList.remove('active');
-    loadEvent();
+    api.editEvent(
+      () => {
+        e.target.reset();
+        document.getElementById('edit-event-modal').classList.remove('active');
+        loadEvent();
+      },
+      (e) => console.log(e),
+      {
+        authorId: Number(user.getUser().id),
+        dto: event,
+      },
+      eventId,
+    );
   }
 }
 

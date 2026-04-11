@@ -11,10 +11,21 @@ export class PostsRepository {
     });
   }
 
-  async findAll(page: number, limit: number) {
+  async findAll(page: number, limit: number, search?: string) {
     return await this.prisma.post.findMany({
+      where: search
+        ? {
+            title: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          }
+        : undefined,
       skip: (page - 1) * limit,
       take: limit,
+      orderBy: {
+        date: 'asc',
+      },
     });
   }
 

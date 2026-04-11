@@ -1,6 +1,5 @@
 // форма входа
 
-import { login } from './api.js';
 import Api from './http-api.js';
 import { user } from './api.js';
 

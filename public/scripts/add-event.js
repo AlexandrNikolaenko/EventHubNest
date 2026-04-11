@@ -1,4 +1,4 @@
-import { store, user } from './api.js';
+import { user } from './api.js';
 import Api from './http-api.js';
 
 if (!user.getUser().id) window.location.assign('/auth/login');
@@ -65,7 +65,6 @@ function handleCreateEvent(e) {
       authorId: Number(user.getUser().id),
       data: event,
     };
-    // store.setEvents(event);
     api.createEvents(handleSuccess, handleError, body);
   }
 }
@@ -132,7 +131,7 @@ function handleChangeUsersInput(e) {
     setUsers(e.target.value);
   } else {
     usersList.classList.add('hide');
-    usersList.innerHTML == '';
+    usersList.innerHTML = '';
   }
 }
 

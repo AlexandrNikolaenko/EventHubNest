@@ -1,4 +1,4 @@
-import { store, user } from './api.js';
+import { user } from './api.js';
 import Api from './http-api.js';
 
 if (!user.getUser().id) window.location.assign('/auth/login');
@@ -7,15 +7,14 @@ const api = new Api();
 // открытие и закрытие формы редактирования события
 
 function handleOpenEditModal(id) {
-  // const event = store.getEventById(id);
   function handleSuccess(event) {
     const form = document.getElementById('edit-event-form');
     form.dataset.id = id;
     form.querySelector('#edit-title').value = event.title;
     form.querySelector('#edit-desc').value = event.desc;
-    form.querySelector('#edit-date').value = new Date(
-      event.date,
-    ).toLocaleDateString('ru-RU');
+    form.querySelector('#edit-date').value = new Date(event.date)
+      .toISOString()
+      .slice(0, 10);
     form.querySelector('#edit-place').value = event.place;
     document.getElementById('edit-event-modal').classList.add('active');
   }
@@ -89,7 +88,6 @@ function handleEditEvent(e) {
       dto: event,
     };
     api.editEvent(handleSuccess, handleError, body, eventId);
-    // store.editEvent(e.target.dataset.id, event);
   }
 }
 

@@ -92,9 +92,14 @@ export class GraphqlApiResolver {
       description: 'Items per page, up to 50.',
     })
     limit: number,
+    @Args('search', {
+      nullable: true,
+      description: 'Case-insensitive title fragment.',
+    })
+    search?: string,
   ) {
     const params = pagination(page, limit);
-    return this.postsService.findAll(params.page, params.limit);
+    return this.postsService.findAll(params.page, params.limit, search);
   }
 
   @Query(() => PostModel, {

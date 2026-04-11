@@ -2,136 +2,81 @@ class HttpRequest {
   #api_host;
 
   constructor() {
-    // this.#api_host = 'https://eventhubnest.onrender.com/api';
-    this.#api_host = 'http://localhost:3000/api';
+    this.#api_host = '/api';
+  }
+
+  async #request({ method, query, body, onSuccess, onError }) {
+    let payload;
+
+    try {
+      const res = await fetch(this.#api_host.concat(query), {
+        method,
+        cache: 'no-cache',
+        headers: body
+          ? {
+              'Content-Type': 'application/json',
+            }
+          : undefined,
+        body: body ? JSON.stringify(body) : undefined,
+      });
+
+      const text = await res.text();
+      try {
+        payload = text ? JSON.parse(text) : null;
+      } catch {
+        payload = text;
+      }
+
+      if (!res.ok) {
+        const error =
+          payload && typeof payload === 'object'
+            ? { ...payload }
+            : { message: payload || String(res.status) };
+        error.status = res.status;
+        error.message = error.message || String(res.status);
+        throw error;
+      }
+
+      if (onSuccess) onSuccess(payload);
+      return payload;
+    } catch (e) {
+      if (onError) onError(e);
+      if (e.status === 401) window.location.assign('/auth/login');
+      return e;
+    }
   }
 
   async get({ onError, onSuccess, query }) {
-    let redirectPath = '';
-    try {
-      const res = await fetch(this.#api_host.concat(query), {
-        method: 'GET',
-        cache: 'no-cache',
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (onSuccess) onSuccess(data);
-        return data;
-      } else throw new Error(await res.json());
-    } catch (e) {
-      console.log(e);
-      if (onError) onError(e);
-      if (e.message == '401') redirectPath = '/auth/login';
-      return e;
-    } finally {
-      if (redirectPath != '') window.location.assign(redirectPath);
-    }
+    return this.#request({ method: 'GET', query, onSuccess, onError });
   }
 
   async post({ onError, onSuccess, query, body }) {
-    let redirectPath = '';
-    try {
-      const res = await fetch(this.#api_host.concat(query), {
-        method: 'POST',
-        cache: 'no-cache',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      console.log(data);
-      if (res.ok) {
-        if (onSuccess) onSuccess(data);
-        return data;
-      } else {
-        if (onError) onError(data);
-        throw new Error(res.status);
-      }
-    } catch (e) {
-      console.log(e);
-      return e;
-    } finally {
-      if (redirectPath != '') window.location.assign(redirectPath);
-    }
+    return this.#request({ method: 'POST', query, body, onSuccess, onError });
   }
 
   async put({ onError, onSuccess, body, query }) {
-    let redirectPath = '';
-    try {
-      const res = await fetch(this.#api_host.concat(query), {
-        method: 'PUT',
-        cache: 'no-cache',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (onSuccess) onSuccess(data);
-        return data;
-      } else throw new Error(await res.json());
-    } catch (e) {
-      console.log(e);
-      if (onError) onError(e);
-      if (e.message == '401') redirectPath = '/auth/login';
-      return e;
-    } finally {
-      if (redirectPath != '') window.location.assign(redirectPath);
-    }
+    return this.#request({ method: 'PUT', query, body, onSuccess, onError });
   }
 
   async patch({ onError, onSuccess, body, query }) {
-    let redirectPath = '';
-    try {
-      const res = await fetch(this.#api_host.concat(query), {
-        method: 'PATCH',
-        cache: 'no-cache',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (onSuccess) onSuccess(data);
-        return data;
-      } else throw new Error(await res.json());
-    } catch (e) {
-      console.log(e);
-      if (onError) onError(e);
-      if (e.message == '401') redirectPath = '/auth/login';
-      return e;
-    } finally {
-      if (redirectPath != '') window.location.assign(redirectPath);
-    }
+    return this.#request({ method: 'PATCH', query, body, onSuccess, onError });
   }
 
   async delete({ onError, onSuccess, query }) {
-    let redirectPath = '';
-    try {
-      const res = await fetch(this.#api_host.concat(query), {
-        method: 'DELETE',
-        cache: 'no-cache',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (onSuccess) onSuccess(data);
-        return data;
-      } else throw new Error(await res.json());
-    } catch (e) {
-      console.log(e);
-      if (onError) onError(e);
-      if (e.message == '401') redirectPath = '/auth/login';
-      return e;
-    } finally {
-      if (redirectPath != '') window.location.assign(redirectPath);
-    }
+    return this.#request({ method: 'DELETE', query, onSuccess, onError });
   }
+}
+
+function params(query) {
+  const search = new URLSearchParams();
+  Object.entries(query).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      search.set(key, value);
+    }
+  });
+
+  const value = search.toString();
+  return value ? `?${value}` : '';
 }
 
 export default class Api {
@@ -143,7 +88,15 @@ export default class Api {
 
   async searchUsers(onSuccess, onError, email) {
     return await this.#httpRequest.get({
-      query: '/users/search?email=' + email,
+      query: `/users/search${params({ email })}`,
+      onSuccess,
+      onError,
+    });
+  }
+
+  async getUser(onSuccess, onError, id) {
+    return await this.#httpRequest.get({
+      query: '/users/' + id,
       onSuccess,
       onError,
     });
@@ -175,9 +128,9 @@ export default class Api {
     });
   }
 
-  async getEvents(onSuccess, onError, userId) {
+  async getEvents(onSuccess, onError, userId, query = {}) {
     return await this.#httpRequest.get({
-      query: '/events' + (userId ? `?userId=${userId}` : ''),
+      query: '/events' + params({ userId, ...query }),
       onSuccess,
       onError,
     });
@@ -221,6 +174,48 @@ export default class Api {
       onSuccess,
       onError,
       body,
+    });
+  }
+
+  async updateReview(onSuccess, onError, id, userId, body) {
+    return await this.#httpRequest.patch({
+      query: `/reviews/${id}${params({ userId })}`,
+      body,
+      onSuccess,
+      onError,
+    });
+  }
+
+  async deleteReview(onSuccess, onError, id, userId) {
+    return await this.#httpRequest.delete({
+      query: `/reviews/${id}${params({ userId })}`,
+      onSuccess,
+      onError,
+    });
+  }
+
+  async getNotifications(onSuccess, onError, userId, query = {}) {
+    return await this.#httpRequest.get({
+      query: '/notifications' + params({ userId, ...query }),
+      onSuccess,
+      onError,
+    });
+  }
+
+  async markNotificationAsRead(onSuccess, onError, id, userId) {
+    return await this.#httpRequest.patch({
+      query: `/notifications/${id}${params({ userId })}`,
+      body: { isRead: true },
+      onSuccess,
+      onError,
+    });
+  }
+
+  async deleteNotification(onSuccess, onError, id, userId) {
+    return await this.#httpRequest.delete({
+      query: `/notifications/${id}${params({ userId })}`,
+      onSuccess,
+      onError,
     });
   }
 

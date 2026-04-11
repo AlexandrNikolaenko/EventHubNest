@@ -350,6 +350,9 @@ type Query {
 
     """Page number starting from 1."""
     page: Int! = 1
+
+    """Case-insensitive title fragment."""
+    search: String
   ): [PostModel!]!
 
   """Get a review by identifier."""

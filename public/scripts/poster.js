@@ -26,26 +26,33 @@ eventSource.onmessage = function (event) {
   switch (data.type) {
     case 'post_created':
       toastr.success('Post created');
-      loadPoster();
+      load(currentSearch);
       break;
 
     case 'post_update':
       toastr.info('Post updated');
-      loadPoster();
+      load(currentSearch);
       break;
 
     case 'post_deleted':
       toastr.warning('Post deleted');
-      loadPoster();
+      load(currentSearch);
       break;
 
     default:
-      loadPoster();
+      load(currentSearch);
   }
 };
 
 function handleSuccess(data) {
   list.innerHTML = '';
+
+  if (!data.length) {
+    document.getElementById('poster__empty').classList.remove('hide');
+    return;
+  }
+
+  document.getElementById('poster__empty').classList.add('hide');
 
   data.forEach((elem) => {
     const post = postTemplate.cloneNode(true);

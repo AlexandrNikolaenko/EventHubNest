@@ -15,7 +15,7 @@
 <section class='wrapper reviews-wrapper'>
   <h3>Отзывы о мероприятии</h3>
 
-  <div class="reviews-content">
+  <div class='reviews-content'>
     <form id='review-form' class='review-form'>
       <label for='review-content' class='body1'>Ваш отзыв</label>
       <textarea id='review-content' name='content' rows='4' required></textarea>
@@ -29,3 +29,33 @@
     <div id='reviews-list' class='reviews-list'></div>
   </div>
 </section>
+
+<div id='edit-review-modal'>
+  <form id='edit-review-form' class='review-edit-form'>
+    <h3>Редактировать отзыв</h3>
+
+    <label for='edit-review-content' class='body1'>Текст отзыва</label>
+    <textarea
+      id='edit-review-content'
+      name='content'
+      rows='4'
+      required
+    ></textarea>
+
+    <label for='edit-review-rating' class='body1'>Рейтинг (1-5)</label>
+    <input
+      id='edit-review-rating'
+      name='rating'
+      type='number'
+      min='1'
+      max='5'
+    />
+
+    <div class='review-edit-actions'>
+      <button class='primary' type='submit'>Сохранить</button>
+      <button id='close-edit-review-modal' class='primary outline' type='button'>
+        Отменить
+      </button>
+    </div>
+  </form>
+</div>

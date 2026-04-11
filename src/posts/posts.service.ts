@@ -88,8 +88,11 @@ export class PostsService {
     return post;
   }
 
-  async findAll(page: number, limit: number) {
-    return this.repository.findAll(page, limit);
+  async findAll(page: number, limit: number, search?: string) {
+    const pageNum = Math.max(1, page);
+    const limitNum = Math.min(Math.max(1, limit), 50);
+
+    return this.repository.findAll(pageNum, limitNum, search);
   }
 
   async findOne(id: number) {
