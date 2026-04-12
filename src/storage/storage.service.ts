@@ -23,6 +23,7 @@ export class StorageService {
     const client = new S3Client({
       endpoint,
       region: this.configService.get<string>('S3_REGION') ?? 'ru-central1',
+      forcePathStyle: true,
       credentials: {
         accessKeyId: this.configService.getOrThrow<string>('S3_ACCESS_KEY_ID'),
         secretAccessKey: this.configService.getOrThrow<string>(
@@ -50,8 +51,8 @@ export class StorageService {
   private hasS3Config() {
     return Boolean(
       this.configService.get<string>('S3_BUCKET') &&
-        this.configService.get<string>('S3_ACCESS_KEY_ID') &&
-        this.configService.get<string>('S3_SECRET_ACCESS_KEY'),
+      this.configService.get<string>('S3_ACCESS_KEY_ID') &&
+      this.configService.get<string>('S3_SECRET_ACCESS_KEY'),
     );
   }
 
