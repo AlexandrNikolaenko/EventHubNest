@@ -1,4 +1,16 @@
-import { Field, GraphQLISODateTime, Int, ObjectType } from '@nestjs/graphql';
+import {
+  Field,
+  GraphQLISODateTime,
+  Int,
+  ObjectType,
+  registerEnumType,
+} from '@nestjs/graphql';
+import { UserRole } from '@prisma/client';
+
+registerEnumType(UserRole, {
+  name: 'UserRole',
+  description: 'Application user role.',
+});
 
 @ObjectType({ description: 'Application user without password data.' })
 export class UserModel {
@@ -13,6 +25,9 @@ export class UserModel {
 
   @Field({ description: 'User avatar URL or local path.' })
   avatar!: string;
+
+  @Field({ description: 'User authorization role.' })
+  role!: UserRole;
 
   @Field(() => [PostModel], {
     description: 'Posts created by this user.',

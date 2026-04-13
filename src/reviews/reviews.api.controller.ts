@@ -8,6 +8,7 @@ import {
   Patch,
   ParseIntPipe,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -24,7 +25,12 @@ import {
   ApiNotFoundResponse,
   ApiInternalServerErrorResponse,
   ApiNoContentResponse,
+  ApiCookieAuth,
 } from '@nestjs/swagger';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import type { AuthUser } from 'src/auth/interfaces/auth-user.interface';
 
 @ApiTags('Reviews')
 @Controller('api/reviews')
@@ -32,13 +38,15 @@ export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
   @Post()
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Create a review' })
   @ApiBody({ type: CreateReviewDto })
   @ApiCreatedResponse({ description: 'Review created', type: CreateReviewDto })
   @ApiBadRequestResponse({ description: 'Invalid review data' })
   @ApiInternalServerErrorResponse({ description: 'Internal error' })
-  create(@Body() dto: CreateReviewDto) {
-    return this.reviewsService.create(dto);
+  create(@Body() dto: CreateReviewDto, @CurrentUser() user: AuthUser) {
+    return this.reviewsService.create({ ...dto, authorId: user.id });
   }
 
   @Get()
@@ -78,6 +86,8 @@ export class ReviewsController {
   }
 
   @Patch(':id')
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Update review' })
   @ApiParam({ name: 'id', type: Number })
   @ApiQuery({ name: 'userId', required: true, type: Number })
@@ -91,13 +101,16 @@ export class ReviewsController {
   @ApiBadRequestResponse({ description: 'Invalid input' })
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Query('userId', ParseIntPipe) userId: number,
+    @CurrentUser() user: AuthUser,
+    @Query('userId') _userId: string,
     @Body() dto: UpdateReviewDto,
   ) {
-    return this.reviewsService.update(id, userId, dto);
+    return this.reviewsService.update(id, user.id, dto, user.role);
   }
 
   @Delete(':id')
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Delete review' })
   @ApiParam({ name: 'id', type: Number })
   @ApiQuery({ name: 'userId', required: false, type: Number })
@@ -105,8 +118,9 @@ export class ReviewsController {
   @ApiNotFoundResponse({ description: 'Review not found' })
   remove(
     @Param('id', ParseIntPipe) id: number,
-    @Query('userId') userId?: string,
+    @CurrentUser() user: AuthUser,
+    @Query('userId') _userId?: string,
   ) {
-    return this.reviewsService.remove(id, userId ? Number(userId) : undefined);
+    return this.reviewsService.remove(id, user.id, user.role);
   }
 }

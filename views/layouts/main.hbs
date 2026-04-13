@@ -5,6 +5,9 @@
 </head>
 <body>
   {{> header}}
+  <script>
+    window.__currentUser = {{#if currentUser}}{ id: {{currentUser.id}}, role: '{{currentUser.role}}' }{{else}}null{{/if}};
+  </script>
 
   <main>
     {{{body}}}

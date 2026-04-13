@@ -13,6 +13,18 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   app.useGlobalFilters(new HttpExceptionFilter());
+  app.enableCors({
+    credentials: true,
+    origin: configService.get('CORS_ORIGIN') ?? true,
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Requested-With',
+      'If-None-Match',
+    ],
+    exposedHeaders: ['ETag', 'X-Elapsed-Time', 'Link'],
+    methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -40,6 +52,7 @@ async function bootstrap() {
     .setTitle('My API')
     .setDescription('Events & Posts API')
     .setVersion('1.0')
+    .addCookieAuth('accessToken')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

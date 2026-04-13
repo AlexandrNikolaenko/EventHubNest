@@ -1,11 +1,12 @@
 import Api from './http-api.js';
+import { user } from './api.js';
 
 const eventId = Number(document.location.pathname.split('/')[2]);
 const api = new Api();
 let editingReviewId = null;
 
 function getCurrentUserId() {
-  const id = window.localStorage.getItem('activeUser');
+  const id = user.getUser().id;
   if (!id) return null;
   const num = Number(id);
   return Number.isNaN(num) ? null : num;

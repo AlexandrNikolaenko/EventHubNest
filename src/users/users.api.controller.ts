@@ -8,9 +8,11 @@ import {
   Patch,
   Query,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
   MaxFileSizeValidator,
   FileTypeValidator,
+  ForbiddenException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UsersService } from './users.service';
@@ -24,10 +26,17 @@ import {
   ApiNotFoundResponse,
   ApiConsumes,
   ApiBody,
+  ApiCookieAuth,
 } from '@nestjs/swagger';
 import { type Express } from 'express';
+import { UserRole } from '@prisma/client';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import type { AuthUser } from 'src/auth/interfaces/auth-user.interface';
 
 @ApiTags('Users')
+@ApiCookieAuth()
 @Controller('api/users')
 export class UsersApiController {
   constructor(
@@ -36,6 +45,7 @@ export class UsersApiController {
   ) {}
 
   @Get('search')
+  @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Search users by email' })
   @ApiQuery({
     name: 'email',
@@ -57,6 +67,7 @@ export class UsersApiController {
 
   @Get(':id')
   @Header('Cache-Control', 'private, no-cache')
+  @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Get user by id' })
   @ApiResponse({
     status: 200,
@@ -64,7 +75,11 @@ export class UsersApiController {
     type: Object,
   })
   @ApiNotFoundResponse({ description: 'User not found' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: AuthUser,
+  ) {
+    this.assertSelfOrAdmin(id, user);
     return this.usersService.findOne(id);
   }
 
@@ -91,8 +106,10 @@ export class UsersApiController {
   @ApiBadRequestResponse({ description: 'Invalid file' })
   @ApiNotFoundResponse({ description: 'User not found' })
   @UseInterceptors(FileInterceptor('avatar'))
+  @UseGuards(AuthGuard, RolesGuard)
   async updateAvatar(
     @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: AuthUser,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
@@ -103,9 +120,16 @@ export class UsersApiController {
     )
     avatar: Express.Multer.File,
   ) {
+    this.assertSelfOrAdmin(id, user);
     await this.usersService.findOne(id);
     const avatarUrl = await this.storageService.uploadUserAvatar(avatar, id);
 
     return this.usersService.updateAvatar(id, avatarUrl);
+  }
+
+  private assertSelfOrAdmin(id: number, user: AuthUser) {
+    if (user.role !== UserRole.ADMIN && user.id !== id) {
+      throw new ForbiddenException('Only owner or admin can access this user');
+    }
   }
 }

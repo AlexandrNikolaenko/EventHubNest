@@ -1,4 +1,5 @@
 import { NotFoundException } from '@nestjs/common';
+import { UserRole } from '@prisma/client';
 import {
   Args,
   Int,
@@ -247,7 +248,7 @@ export class GraphqlApiResolver {
   ) {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      select: { id: true, name: true, email: true, avatar: true },
+      select: { id: true, name: true, email: true, avatar: true, role: true },
     });
 
     if (!user) {
@@ -342,7 +343,7 @@ export class GraphqlApiResolver {
     @Args('input', { description: 'Event fields to change.' })
     input: UpdateEventInput,
   ) {
-    return this.eventsService.update(id, authorId, input);
+    return this.eventsService.update(id, authorId, input, UserRole.USER);
   }
 
   @Mutation(() => EventModel, { description: 'Delete an event.' })
@@ -350,7 +351,7 @@ export class GraphqlApiResolver {
     @Args('id', { type: () => Int, description: 'Event identifier.' })
     id: number,
   ) {
-    return this.eventsService.remove(id);
+    return this.eventsService.remove(id, 0, UserRole.ADMIN);
   }
 
   @Mutation(() => ReviewModel, { description: 'Create a review.' })
@@ -373,7 +374,7 @@ export class GraphqlApiResolver {
     @Args('input', { description: 'Review fields to change.' })
     input: UpdateReviewInput,
   ) {
-    return this.reviewsService.update(id, userId, input);
+    return this.reviewsService.update(id, userId, input, UserRole.USER);
   }
 
   @Mutation(() => ReviewModel, { description: 'Delete a review.' })
@@ -381,7 +382,7 @@ export class GraphqlApiResolver {
     @Args('id', { type: () => Int, description: 'Review identifier.' })
     id: number,
   ) {
-    return this.reviewsService.remove(id);
+    return this.reviewsService.remove(id, undefined, UserRole.ADMIN);
   }
 
   @Mutation(() => NotificationModel, { description: 'Create a notification.' })
@@ -564,7 +565,7 @@ export class PostFieldsResolver {
   author(@Parent() post: PostModel) {
     return this.prisma.user.findUnique({
       where: { id: post.authorId },
-      select: { id: true, name: true, email: true, avatar: true },
+      select: { id: true, name: true, email: true, avatar: true, role: true },
     });
   }
 
@@ -608,7 +609,7 @@ export class EventFieldsResolver {
   author(@Parent() event: EventModel) {
     return this.prisma.user.findUnique({
       where: { id: event.authorId },
-      select: { id: true, name: true, email: true, avatar: true },
+      select: { id: true, name: true, email: true, avatar: true, role: true },
     });
   }
 
@@ -638,7 +639,7 @@ export class EventFieldsResolver {
       take: params.limit,
       include: {
         user: {
-          select: { id: true, name: true, email: true, avatar: true },
+          select: { id: true, name: true, email: true, avatar: true, role: true },
         },
       },
       orderBy: { id: 'asc' },
@@ -660,7 +661,7 @@ export class ReviewFieldsResolver {
   author(@Parent() review: ReviewModel) {
     return this.prisma.user.findUnique({
       where: { id: review.authorId },
-      select: { id: true, name: true, email: true, avatar: true },
+      select: { id: true, name: true, email: true, avatar: true, role: true },
     });
   }
 
@@ -686,7 +687,7 @@ export class NotificationFieldsResolver {
   user(@Parent() notification: NotificationModel) {
     return this.prisma.user.findUnique({
       where: { id: notification.userId },
-      select: { id: true, name: true, email: true, avatar: true },
+      select: { id: true, name: true, email: true, avatar: true, role: true },
     });
   }
 }

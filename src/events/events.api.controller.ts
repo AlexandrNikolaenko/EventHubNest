@@ -9,6 +9,7 @@ import {
   Query,
   ParseIntPipe,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -27,9 +28,14 @@ import {
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiProperty,
+  ApiCookieAuth,
 } from '@nestjs/swagger';
 import { ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import type { AuthUser } from 'src/auth/interfaces/auth-user.interface';
 
 export class CreateEventRequestDto {
   @ApiProperty({ example: 1 })
@@ -52,6 +58,8 @@ export class UpdateEventRequestDto {
 }
 
 @ApiTags('Events')
+@ApiCookieAuth()
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('api/events')
 export class ApiEventsController {
   constructor(private readonly eventsService: EventsService) {}
@@ -67,9 +75,10 @@ export class ApiEventsController {
   @ApiInternalServerErrorResponse({ description: 'Internal error' })
   create(
     @Body() { authorId, data }: { authorId: number; data: CreateEventDto },
+    @CurrentUser() user: AuthUser,
   ) {
     console.log(data);
-    return this.eventsService.create(authorId, data);
+    return this.eventsService.create(user.id, data);
   }
 
   @Get()
@@ -103,7 +112,7 @@ export class ApiEventsController {
   @ApiBadRequestResponse({ description: 'Invalid query parameters' })
   @ApiInternalServerErrorResponse({ description: 'Internal error' })
   async findAll(
-    @Query('userId', ParseIntPipe) userId: number,
+    @CurrentUser() user: AuthUser,
     @Query('page', ParseIntPipe) page = 1,
     @Query('limit', ParseIntPipe) limit = 10,
     @Res() res: express.Response,
@@ -111,7 +120,7 @@ export class ApiEventsController {
     const pageNum = page;
     const limitNum = limit > 50 ? 50 : limit; // ограничение на максимум 50 записей за запрос
 
-    const data = await this.eventsService.findAll(userId, pageNum, limitNum);
+    const data = await this.eventsService.findAll(user.id, pageNum, limitNum);
 
     // HATEOAS links
     const prevPage = pageNum > 1 ? pageNum - 1 : null;
@@ -166,8 +175,9 @@ export class ApiEventsController {
   update(
     @Param('id') id: string,
     @Body() { authorId, dto }: { authorId: number; dto: UpdateEventDto },
+    @CurrentUser() user: AuthUser,
   ) {
-    return this.eventsService.update(Number(id), authorId, dto);
+    return this.eventsService.update(Number(id), user.id, dto, user.role);
   }
 
   @Delete(':id')
@@ -175,7 +185,7 @@ export class ApiEventsController {
   @ApiParam({ name: 'id', type: Number, description: 'Event id' })
   @ApiNoContentResponse({ description: 'Event deleted' })
   @ApiNotFoundResponse({ description: 'Event not found' })
-  remove(@Param('id') id: string) {
-    return this.eventsService.remove(Number(id));
+  remove(@Param('id') id: string, @CurrentUser() user: AuthUser) {
+    return this.eventsService.remove(Number(id), user.id, user.role);
   }
 }

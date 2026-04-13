@@ -1,29 +1,26 @@
 class UserSession {
-  constructor(id = null) {
-    this.id = id;
+  constructor(user = null) {
+    this.user = user;
   }
 
-  updateUser(id) {
-    this.id = Number(id);
-    window.localStorage.setItem('activeUser', String(this.id));
+  updateUser(user) {
+    this.user = user;
+    window.__currentUser = user;
   }
 
   deleteUser() {
-    this.id = null;
-    window.localStorage.removeItem('activeUser');
+    this.user = null;
+    window.__currentUser = null;
   }
 
   getUser() {
     return {
-      id: this.id,
+      ...(this.user || {}),
     };
   }
 
   static initUser() {
-    const savedId = window.localStorage.getItem('activeUser');
-    const parsedId = savedId ? Number(savedId) : null;
-
-    return new UserSession(Number.isNaN(parsedId) ? null : parsedId);
+    return new UserSession(window.__currentUser || null);
   }
 }
 
@@ -51,6 +48,11 @@ export function register() {
 
 export function logout(e) {
   e.preventDefault();
-  user.deleteUser();
-  window.location.assign('/auth/login');
+  fetch('/api/auth/logout', {
+    method: 'POST',
+    credentials: 'same-origin',
+  }).finally(() => {
+    user.deleteUser();
+    window.location.assign('/auth/login');
+  });
 }

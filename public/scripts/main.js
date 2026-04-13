@@ -9,9 +9,7 @@ let selectedUsers = [];
 let loadedEvents = [];
 let viewMode = 'list';
 
-const eventSource = new EventSource(
-  `/api/notifications/events?userId=${currentUserId}`,
-);
+const eventSource = new EventSource('/api/notifications/events');
 
 eventSource.onmessage = function (event) {
   const data = JSON.parse(event.data);

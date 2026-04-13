@@ -12,6 +12,7 @@ class HttpRequest {
     try {
       const res = await fetch(this.#api_host.concat(query), {
         method,
+        credentials: 'same-origin',
         cache: method === 'GET' ? 'default' : 'no-store',
         headers: body && !isFormData
           ? {
@@ -98,6 +99,14 @@ export default class Api {
   async getUser(onSuccess, onError, id) {
     return await this.#httpRequest.get({
       query: '/users/' + id,
+      onSuccess,
+      onError,
+    });
+  }
+
+  async getSession(onSuccess, onError) {
+    return await this.#httpRequest.get({
+      query: '/auth/me',
       onSuccess,
       onError,
     });

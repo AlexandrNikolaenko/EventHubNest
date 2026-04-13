@@ -522,4 +522,7 @@ type UserModel {
     """Page number starting from 1."""
     page: Int! = 1
   ): [ReviewModel!]
+
+  """User authorization role."""
+  role: String!
 }

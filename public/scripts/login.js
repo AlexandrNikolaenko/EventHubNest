@@ -29,7 +29,7 @@ function initState() {
 }
 
 function onSuccess(data) {
-  user.updateUser(data.userId);
+  user.updateUser(data.user);
   window.location.assign('/events');
   return;
 }

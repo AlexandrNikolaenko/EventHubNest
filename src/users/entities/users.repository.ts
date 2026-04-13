@@ -11,6 +11,7 @@ export class UsersRepository {
         name: true,
         email: true,
         avatar: true,
+        role: true,
       },
     });
   }
@@ -28,6 +29,7 @@ export class UsersRepository {
         name: true,
         email: true,
         avatar: true,
+        role: true,
       },
       take: 10, // лимит для autocomplete
     });
@@ -42,6 +44,7 @@ export class UsersRepository {
         name: true,
         email: true,
         avatar: true,
+        role: true,
       },
     });
   }

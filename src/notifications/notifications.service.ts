@@ -10,6 +10,7 @@ import { NotificationsRepository } from './entities/notifications.repository';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { filter, Subject } from 'rxjs';
 import { MessageEvent } from '@nestjs/common';
+import { UserRole } from '@prisma/client';
 
 @Injectable()
 export class NotificationsService {
@@ -63,7 +64,12 @@ export class NotificationsService {
     return this.repository.findOne(id);
   }
 
-  async update(id: number, userId: number, dto: UpdateNotificationDto) {
+  async update(
+    id: number,
+    userId: number,
+    dto: UpdateNotificationDto,
+    role: UserRole = UserRole.USER,
+  ) {
     const notification = await this.prisma.notification.findUnique({
       where: { id },
     });
@@ -72,13 +78,13 @@ export class NotificationsService {
       throw new NotFoundException('Notification not found');
     }
 
-    if (notification.userId !== userId) {
+    if (role !== UserRole.ADMIN && notification.userId !== userId) {
       throw new ForbiddenException('Author not found');
     }
     return this.repository.update(id, dto);
   }
 
-  async remove(id: number, userId: number) {
+  async remove(id: number, userId: number, role: UserRole = UserRole.USER) {
     const notification = await this.prisma.notification.findUnique({
       where: { id },
     });
@@ -87,7 +93,7 @@ export class NotificationsService {
       throw new NotFoundException('Notification not found');
     }
 
-    if (notification.userId !== userId) {
+    if (role !== UserRole.ADMIN && notification.userId !== userId) {
       throw new ForbiddenException('Author not found');
     }
 

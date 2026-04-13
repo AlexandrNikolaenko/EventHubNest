@@ -8,6 +8,9 @@
         {{> nav-link href='/events' text='Создать событие'}}
         {{> nav-link href='/profile' text='Кабинет'}}
         {{> nav-link href='/about' text='О нас'}}
+        {{#if currentUser}}
+          <span class='body1 header__user'>{{currentUser.name}} · {{currentUser.role}}</span>
+        {{/if}}
         <a href='/auth/login' class='header__button-enter'>
           <button class='secondary'>Войти</button>
         </a>

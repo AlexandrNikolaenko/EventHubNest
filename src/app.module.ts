@@ -32,7 +32,11 @@ import { EtagInterceptor } from './common/interceptors/etag.interceptor';
       introspection: true,
       context: ({ req, res }) => ({ req, res }),
     }),
-    AuthModule,
+    AuthModule.register({
+      cookieName: process.env.AUTH_COOKIE_NAME ?? 'accessToken',
+      expiresInSeconds: Number(process.env.AUTH_TOKEN_TTL_SECONDS ?? 604800),
+      jwtSecret: process.env.AUTH_JWT_SECRET ?? 'dev-secret-change-me',
+    }),
     PostsModule,
     EventsModule,
     UsersModule,

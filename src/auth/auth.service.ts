@@ -8,6 +8,7 @@ import { LoginDto } from './dto/login.dto';
 import { AuthRepository } from './entities/auth.repository';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RegisterDto } from './dto/register.gto';
+import { UserRole } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -33,7 +34,10 @@ export class AuthService {
       });
     }
 
-    return { userId: user.id };
+    return {
+      userId: user.id,
+      user: this.toAuthUser(user),
+    };
   }
 
   async register(dto: RegisterDto) {
@@ -48,6 +52,35 @@ export class AuthService {
 
     const user = await this.authRepository.create(dto);
 
-    return { userId: user.id };
+    return {
+      userId: user.id,
+      user: this.toAuthUser(user),
+    };
+  }
+
+  async validateUser(id: number) {
+    const user = await this.authRepository.findById(id);
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    return this.toAuthUser(user);
+  }
+
+  private toAuthUser(user: {
+    avatar: string;
+    email: string;
+    id: number;
+    name: string;
+    role: UserRole;
+  }) {
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      avatar: user.avatar,
+      role: user.role,
+    };
   }
 }

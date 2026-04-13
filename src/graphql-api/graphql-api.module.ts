@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from 'src/auth/auth.module';
 import { EventsModule } from 'src/events/events.module';
 import { NotificationsModule } from 'src/notifications/notifications.module';
 import { PostsModule } from 'src/posts/posts.module';
@@ -17,7 +16,6 @@ import {
 
 @Module({
   imports: [
-    AuthModule,
     EventsModule,
     NotificationsModule,
     PostsModule,

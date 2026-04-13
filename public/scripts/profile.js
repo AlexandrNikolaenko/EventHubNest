@@ -151,9 +151,7 @@ function handleAvatarSubmit(e) {
 }
 
 if (currentUserId) {
-  const eventSource = new EventSource(
-    `/api/notifications/events?userId=${currentUserId}`,
-  );
+  const eventSource = new EventSource('/api/notifications/events');
 
   eventSource.onmessage = function (event) {
     const data = JSON.parse(event.data);

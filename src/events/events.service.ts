@@ -8,6 +8,7 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { EventsRepository } from './entities/events.repository';
+import { UserRole } from '@prisma/client';
 
 @Injectable()
 export class EventsService {
@@ -42,7 +43,12 @@ export class EventsService {
     return event;
   }
 
-  async update(id: number, userId: number, dto: UpdateEventDto) {
+  async update(
+    id: number,
+    userId: number,
+    dto: UpdateEventDto,
+    role: UserRole = UserRole.USER,
+  ) {
     if (isNaN(Number(id))) {
       throw new BadRequestException('Id should be integer');
     }
@@ -53,18 +59,22 @@ export class EventsService {
     }
 
     // проверка владельца (очень важно для оценки)
-    if (event.authorId !== userId) {
+    if (role !== UserRole.ADMIN && event.authorId !== userId) {
       throw new ForbiddenException('You cannot edit this event');
     }
 
     return this.repository.updateEvent(id, userId, dto);
   }
 
-  async remove(id: number) {
+  async remove(id: number, userId: number, role: UserRole) {
     const event = await this.repository.findOne(id);
 
     if (!event) {
       throw new NotFoundException('Event not found');
+    }
+
+    if (role !== UserRole.ADMIN && event.authorId !== userId) {
+      throw new ForbiddenException('You cannot delete this event');
     }
 
     return this.repository.remove(id);

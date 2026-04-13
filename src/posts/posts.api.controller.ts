@@ -12,6 +12,7 @@ import {
   Res,
   Header,
   UseInterceptors,
+  UseGuards,
 } from '@nestjs/common';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { PostsService } from './posts.service';
@@ -33,7 +34,14 @@ import {
   ApiNotFoundResponse,
   ApiInternalServerErrorResponse,
   ApiNoContentResponse,
+  ApiCookieAuth,
 } from '@nestjs/swagger';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import type { AuthUser } from 'src/auth/interfaces/auth-user.interface';
+import { UserRole } from '@prisma/client';
 
 @ApiTags('Posts')
 @Controller('api/posts')
@@ -58,6 +66,8 @@ export class ApiPostsController {
   }
 
   @Post()
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Create a new post' })
   @ApiBody({ type: CreatePostDto })
   @ApiCreatedResponse({
@@ -66,8 +76,11 @@ export class ApiPostsController {
   })
   @ApiBadRequestResponse({ description: 'Invalid payload' })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
-  create(@Body() createPostDto: CreatePostDto) {
-    return this.postsService.create(createPostDto);
+  create(
+    @Body() createPostDto: CreatePostDto,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.postsService.create({ ...createPostDto, authorId: user.id });
   }
 
   @Get()
@@ -131,6 +144,8 @@ export class ApiPostsController {
   }
 
   @Patch(':id')
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Update post by id' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdatePostDto })
@@ -146,6 +161,9 @@ export class ApiPostsController {
   }
 
   @Delete(':id')
+  @ApiCookieAuth()
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Delete post by id' })
   @ApiParam({ name: 'id', type: Number })
   @ApiNoContentResponse({ description: 'Post deleted' })

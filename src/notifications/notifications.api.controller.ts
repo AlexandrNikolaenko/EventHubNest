@@ -10,6 +10,7 @@ import {
   Sse,
   MessageEvent,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
 import { Observable } from 'rxjs';
@@ -28,9 +29,18 @@ import {
   ApiNotFoundResponse,
   ApiInternalServerErrorResponse,
   ApiNoContentResponse,
+  ApiCookieAuth,
 } from '@nestjs/swagger';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import type { AuthUser } from 'src/auth/interfaces/auth-user.interface';
+import { UserRole } from '@prisma/client';
 
 @ApiTags('Notifications')
+@ApiCookieAuth()
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('api/notifications')
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
@@ -54,11 +64,15 @@ export class NotificationsController {
       },
     },
   })
-  sse(@Query('userId', ParseIntPipe) userId: number): Observable<MessageEvent> {
-    return this.notificationsService.getUserStream(userId);
+  sse(
+    @CurrentUser() user: AuthUser,
+    @Query('userId') _userId?: string,
+  ): Observable<MessageEvent> {
+    return this.notificationsService.getUserStream(user.id);
   }
 
   @Post()
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Create a notification' })
   @ApiBody({ type: CreateNotificationDto })
   @ApiCreatedResponse({
@@ -84,12 +98,13 @@ export class NotificationsController {
   })
   @ApiNotFoundResponse({ description: 'User not found or no notifications' })
   findAll(
-    @Query('userId', ParseIntPipe) userId: number,
+    @CurrentUser() user: AuthUser,
+    @Query('userId') _userId: string,
     @Query('page') page = '1',
     @Query('limit') limit = '10',
   ) {
     return this.notificationsService.findAll(
-      userId,
+      user.id,
       Number(page),
       Number(limit),
     );
@@ -122,10 +137,11 @@ export class NotificationsController {
   @ApiNotFoundResponse({ description: 'Notification not found' })
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Query('userId', ParseIntPipe) userId: number,
+    @CurrentUser() user: AuthUser,
+    @Query('userId') _userId: string,
     @Body() dto: UpdateNotificationDto,
   ) {
-    return this.notificationsService.update(id, userId, dto);
+    return this.notificationsService.update(id, user.id, dto, user.role);
   }
 
   @Delete(':id')
@@ -136,8 +152,9 @@ export class NotificationsController {
   @ApiNotFoundResponse({ description: 'Notification not found' })
   remove(
     @Param('id', ParseIntPipe) id: number,
-    @Query('userId', ParseIntPipe) userId: number,
+    @CurrentUser() user: AuthUser,
+    @Query('userId') _userId: string,
   ) {
-    return this.notificationsService.remove(id, userId);
+    return this.notificationsService.remove(id, user.id, user.role);
   }
 }

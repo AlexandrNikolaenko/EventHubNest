@@ -17,4 +17,10 @@ export class AuthRepository {
       where: { email },
     });
   }
+
+  async findById(id: number) {
+    return await this.prisma.user.findUnique({
+      where: { id },
+    });
+  }
 }
