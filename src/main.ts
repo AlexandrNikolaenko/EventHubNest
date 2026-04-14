@@ -9,11 +9,16 @@ import { HttpExceptionFilter } from './common/filters/http-exeption.filter';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { errorHandler } from 'supertokens-node/framework/express';
 import { SuperTokensAuthService } from './infrastructure/auth/supertokens-auth.service';
+import { AuthService } from './auth/auth.service';
+import { UserRole } from '@prisma/client';
+import type { NextFunction, Response } from 'express';
+import type { AuthRequest } from './auth/interfaces/auth-request.interface';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
   const superTokensAuth = app.get(SuperTokensAuthService);
+  const authService = app.get(AuthService);
 
   app.useGlobalFilters(new HttpExceptionFilter());
   app.enableCors({
@@ -52,6 +57,38 @@ async function bootstrap() {
 
   app.useStaticAssets(join(__dirname, '..', 'public'));
 
+  const requireAdmin = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
+    try {
+      const session = await superTokensAuth.getSession(req, res, false);
+
+      if (!session) {
+        return rejectUnauthenticated(req, res);
+      }
+
+      req.session = session;
+      req.authUser = await authService.resolveSessionUser(session);
+      res.locals.currentUser = req.authUser;
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      if (req.authUser.role !== UserRole.ADMIN) {
+        return rejectForbidden(req, res);
+      }
+
+      next();
+    } catch {
+      return rejectUnauthenticated(req, res);
+    }
+  };
+
+  app.use('/graphql', requireAdmin);
+  app.use('/api/docs', requireAdmin);
+  app.use('/api/docs-json', requireAdmin);
+  app.use('/api/docs-yaml', requireAdmin);
+
   const config = new DocumentBuilder()
     .setTitle('My API')
     .setDescription('Events & Posts API')
@@ -66,4 +103,23 @@ async function bootstrap() {
 
   await app.listen(configService.get('PORT') ?? 3000);
 }
+
+function rejectUnauthenticated(req: AuthRequest, res: Response) {
+  if (req.method === 'GET' && req.accepts('html')) {
+    res.redirect('/auth/login');
+    return;
+  }
+
+  res.status(401).json({ message: 'Authentication required' });
+}
+
+function rejectForbidden(req: AuthRequest, res: Response) {
+  if (req.method === 'GET' && req.accepts('html')) {
+    res.status(403).send('Admin access required');
+    return;
+  }
+
+  res.status(403).json({ message: 'Admin access required' });
+}
+
 void bootstrap();
