@@ -65,7 +65,7 @@ button.gen-event {
   height: 100vh;
   overflow-y: scroll;
   align-items: start;
-  background-color: rgba(96, 125, 139, 0.25);
+  background-color: white;
 }
 
 #create-event-modal.active,
