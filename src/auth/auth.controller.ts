@@ -1,27 +1,17 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Render,
-  Res,
-  Inject,
-} from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { LoginDto } from './dto/login.dto';
-import { RegisterDto } from './dto/register.gto';
+import { Controller, Get, Post, Body, Render, Res, Req } from '@nestjs/common';
 import {
   ApiCookieAuth,
   ApiExcludeController,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import type { Response } from 'express';
-import { AuthTokenService } from './auth-token.service';
-import { AUTH_OPTIONS } from './auth.constants';
-import type { AuthModuleOptions } from './interfaces/auth-options.interface';
-import { PublicAccess } from './decorators/public-access.decorator';
+import type { Request, Response } from 'express';
+import { SuperTokensAuthService } from 'src/infrastructure/auth/supertokens-auth.service';
+import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
+import { PublicAccess } from './decorators/public-access.decorator';
+import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.gto';
 import type { AuthUser } from './interfaces/auth-user.interface';
 
 @ApiTags('Auth')
@@ -29,57 +19,52 @@ import type { AuthUser } from './interfaces/auth-user.interface';
 @PublicAccess()
 export class ApiAuthController {
   constructor(
-    @Inject(AUTH_OPTIONS)
-    private readonly options: AuthModuleOptions,
     private readonly authService: AuthService,
-    private readonly tokenService: AuthTokenService,
+    private readonly superTokensAuth: SuperTokensAuthService,
   ) {}
 
   @Post('login')
-  @ApiOperation({ summary: 'Log in and set authentication cookie' })
+  @ApiOperation({
+    summary: 'Log in through SuperTokens and set session cookies',
+  })
   async login(
     @Body() createAuthDto: LoginDto,
+    @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const result = await this.authService.login(createAuthDto);
-    this.setAuthCookie(response, result.userId);
-
-    return result;
+    return this.authService.login(createAuthDto, request, response);
   }
 
   @Post('register')
-  @ApiOperation({ summary: 'Register and set authentication cookie' })
+  @ApiOperation({
+    summary: 'Register through SuperTokens and set session cookies',
+  })
   async register(
     @Body() createAuthDto: RegisterDto,
+    @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const result = await this.authService.register(createAuthDto);
-    this.setAuthCookie(response, result.userId);
-
-    return result;
+    return this.authService.register(createAuthDto, request, response);
   }
 
   @Post('logout')
-  @ApiOperation({ summary: 'Clear authentication cookie' })
-  logout(@Res({ passthrough: true }) response: Response) {
-    response.clearCookie(this.options.cookieName);
+  @ApiCookieAuth('sAccessToken')
+  @ApiOperation({ summary: 'Revoke current SuperTokens session' })
+  async logout(
+    @Req() request: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const session = await this.superTokensAuth.getSession(request, res, false);
+    await session?.revokeSession();
+
     return { ok: true };
   }
 
   @Get('me')
-  @ApiCookieAuth()
+  @ApiCookieAuth('sAccessToken')
   @ApiOperation({ summary: 'Get current session user' })
   me(@CurrentUser() user?: AuthUser) {
     return { user: user ?? null };
-  }
-
-  private setAuthCookie(response: Response, userId: number) {
-    response.cookie(this.options.cookieName, this.tokenService.sign(userId), {
-      httpOnly: true,
-      maxAge: this.options.expiresInSeconds * 1000,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-    });
   }
 }
 
@@ -87,8 +72,6 @@ export class ApiAuthController {
 @Controller('auth')
 @PublicAccess()
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
-
   @Get('login')
   @Render('login')
   login() {

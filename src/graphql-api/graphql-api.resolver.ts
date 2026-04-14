@@ -2,6 +2,7 @@ import { NotFoundException } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
 import {
   Args,
+  Context,
   Int,
   Mutation,
   Parent,
@@ -10,6 +11,7 @@ import {
   Resolver,
 } from '@nestjs/graphql';
 import { AuthService } from 'src/auth/auth.service';
+import type { Request, Response } from 'express';
 import { EventsService } from 'src/events/events.service';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { PostsService } from 'src/posts/posts.service';
@@ -277,8 +279,9 @@ export class GraphqlApiResolver {
   registerUser(
     @Args('input', { description: 'User registration data.' })
     input: RegisterUserInput,
+    @Context() context: { req: Request; res: Response },
   ) {
-    return this.authService.register(input);
+    return this.authService.register(input, context.req, context.res);
   }
 
   @Mutation(() => AuthResultModel, {
@@ -287,8 +290,9 @@ export class GraphqlApiResolver {
   loginUser(
     @Args('input', { description: 'User login data.' })
     input: LoginInput,
+    @Context() context: { req: Request; res: Response },
   ) {
-    return this.authService.login(input);
+    return this.authService.login(input, context.req, context.res);
   }
 
   @Mutation(() => PostModel, { description: 'Create a post.' })

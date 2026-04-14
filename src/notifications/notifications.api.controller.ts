@@ -39,7 +39,7 @@ import type { AuthUser } from 'src/auth/interfaces/auth-user.interface';
 import { UserRole } from '@prisma/client';
 
 @ApiTags('Notifications')
-@ApiCookieAuth()
+@ApiCookieAuth('sAccessToken')
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('api/notifications')
 export class NotificationsController {

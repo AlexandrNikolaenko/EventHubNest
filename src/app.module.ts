@@ -6,8 +6,9 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'node:path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { SuperTokensAuthModule } from './infrastructure/auth/supertokens-auth.module';
 import { PostsModule } from './posts/posts.module';
 import { EventsModule } from './events/events.module';
 import { UsersModule } from './users/users.module';
@@ -20,7 +21,9 @@ import { EtagInterceptor } from './common/interceptors/etag.interceptor';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     CacheModule.register({
       isGlobal: true,
       ttl: 5000,
@@ -30,13 +33,33 @@ import { EtagInterceptor } from './common/interceptors/etag.interceptor';
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       sortSchema: true,
       introspection: true,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       context: ({ req, res }) => ({ req, res }),
     }),
-    AuthModule.register({
-      cookieName: process.env.AUTH_COOKIE_NAME ?? 'accessToken',
-      expiresInSeconds: Number(process.env.AUTH_TOKEN_TTL_SECONDS ?? 604800),
-      jwtSecret: process.env.AUTH_JWT_SECRET ?? 'dev-secret-change-me',
+    SuperTokensAuthModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        connectionUri:
+          configService.get<string>('SUPERTOKENS_CONNECTION_URI') ?? '',
+        apiKey: configService.get<string>('SUPERTOKENS_API_KEY'),
+        appName: configService.get<string>('APP_NAME') ?? 'My Nest App',
+        apiDomain:
+          configService.get<string>('API_DOMAIN') ?? 'http://localhost:3000',
+        websiteDomain:
+          configService.get<string>('WEBSITE_DOMAIN') ??
+          'http://localhost:3000',
+        apiBasePath: configService.get<string>('API_BASE_PATH') ?? '/api/auth',
+        websiteBasePath:
+          configService.get<string>('WEBSITE_BASE_PATH') ?? '/auth',
+        cookieSecure:
+          configService.get<string>('NODE_ENV') === 'production' ||
+          (configService.get<string>('API_DOMAIN') ?? '').startsWith(
+            'https://',
+          ),
+      }),
     }),
+    AuthModule,
     PostsModule,
     EventsModule,
     UsersModule,

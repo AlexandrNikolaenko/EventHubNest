@@ -66,7 +66,7 @@ export class ApiPostsController {
   }
 
   @Post()
-  @ApiCookieAuth()
+  @ApiCookieAuth('sAccessToken')
   @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Create a new post' })
   @ApiBody({ type: CreatePostDto })
@@ -141,7 +141,7 @@ export class ApiPostsController {
   }
 
   @Patch(':id')
-  @ApiCookieAuth()
+  @ApiCookieAuth('sAccessToken')
   @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Update post by id' })
   @ApiParam({ name: 'id', type: Number })
@@ -158,8 +158,9 @@ export class ApiPostsController {
   }
 
   @Delete(':id')
-  @ApiCookieAuth()
+  @ApiCookieAuth('sAccessToken')
   @UseGuards(AuthGuard, RolesGuard)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Delete post by id' })
   @ApiParam({ name: 'id', type: Number })

@@ -7,10 +7,13 @@ import { engine } from 'express-handlebars';
 import { ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './common/filters/http-exeption.filter';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { errorHandler } from 'supertokens-node/framework/express';
+import { SuperTokensAuthService } from './infrastructure/auth/supertokens-auth.service';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
+  const superTokensAuth = app.get(SuperTokensAuthService);
 
   app.useGlobalFilters(new HttpExceptionFilter());
   app.enableCors({
@@ -21,8 +24,9 @@ async function bootstrap() {
       'Authorization',
       'X-Requested-With',
       'If-None-Match',
+      ...superTokensAuth.getCorsHeaders(),
     ],
-    exposedHeaders: ['ETag', 'X-Elapsed-Time', 'Link'],
+    exposedHeaders: ['ETag', 'X-Elapsed-Time', 'Link', 'front-token'],
     methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   });
 
@@ -52,12 +56,13 @@ async function bootstrap() {
     .setTitle('My API')
     .setDescription('Events & Posts API')
     .setVersion('1.0')
-    .addCookieAuth('accessToken')
+    .addCookieAuth('sAccessToken')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
 
   SwaggerModule.setup('api/docs', app, document);
+  app.use(errorHandler());
 
   await app.listen(configService.get('PORT') ?? 3000);
 }

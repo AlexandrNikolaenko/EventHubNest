@@ -36,7 +36,7 @@ import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import type { AuthUser } from 'src/auth/interfaces/auth-user.interface';
 
 @ApiTags('Users')
-@ApiCookieAuth()
+@ApiCookieAuth('sAccessToken')
 @Controller('api/users')
 export class UsersApiController {
   constructor(

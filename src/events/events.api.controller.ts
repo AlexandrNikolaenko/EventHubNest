@@ -39,26 +39,26 @@ import type { AuthUser } from 'src/auth/interfaces/auth-user.interface';
 
 export class CreateEventRequestDto {
   @ApiProperty({ example: 1 })
-  authorId: number;
+  authorId!: number;
 
   @ApiProperty({ type: CreateEventDto })
   @ValidateNested()
   @Type(() => CreateEventDto)
-  data: CreateEventDto;
+  data!: CreateEventDto;
 }
 
 export class UpdateEventRequestDto {
   @ApiProperty({ example: 1 })
-  authorId: number;
+  authorId!: number;
 
   @ApiProperty({ type: UpdateEventDto })
   @ValidateNested()
   @Type(() => UpdateEventDto)
-  dto: UpdateEventDto;
+  dto!: UpdateEventDto;
 }
 
 @ApiTags('Events')
-@ApiCookieAuth()
+@ApiCookieAuth('sAccessToken')
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('api/events')
 export class ApiEventsController {
@@ -74,7 +74,7 @@ export class ApiEventsController {
   @ApiBadRequestResponse({ description: 'Validation failed' })
   @ApiInternalServerErrorResponse({ description: 'Internal error' })
   create(
-    @Body() { authorId, data }: { authorId: number; data: CreateEventDto },
+    @Body() { data }: { authorId: number; data: CreateEventDto },
     @CurrentUser() user: AuthUser,
   ) {
     console.log(data);
@@ -174,7 +174,7 @@ export class ApiEventsController {
   @ApiBadRequestResponse({ description: 'Invalid payload or id' })
   update(
     @Param('id') id: string,
-    @Body() { authorId, dto }: { authorId: number; dto: UpdateEventDto },
+    @Body() { dto }: { authorId: number; dto: UpdateEventDto },
     @CurrentUser() user: AuthUser,
   ) {
     return this.eventsService.update(Number(id), user.id, dto, user.role);

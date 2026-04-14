@@ -2,118 +2,72 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-"""
-Authentication operation result.
-"""
+"""Authentication operation result."""
 type AuthResultModel {
-  """
-  Identifier of the authenticated user.
-  """
+  """Identifier of the authenticated user."""
   userId: Int!
 }
 
-"""
-Data needed to create an event.
-"""
+"""Data needed to create an event."""
 input CreateEventInput {
-  """
-  Event date in ISO 8601 format.
-  """
+  """Event date in ISO 8601 format."""
   date: String!
 
-  """
-  Event description.
-  """
+  """Event description."""
   desc: String!
 
-  """
-  Event location.
-  """
+  """Event location."""
   place: String!
 
-  """
-  Event title.
-  """
+  """Event title."""
   title: String!
 
-  """
-  Email addresses of users registered for the event.
-  """
+  """Email addresses of users registered for the event."""
   users: [String!]!
 }
 
-"""
-Data needed to create a notification.
-"""
+"""Data needed to create a notification."""
 input CreateNotificationInput {
-  """
-  Notification message.
-  """
+  """Notification message."""
   message: String!
 
-  """
-  Identifier of the notification recipient.
-  """
+  """Identifier of the notification recipient."""
   userId: Int!
 }
 
-"""
-Data needed to create a post.
-"""
+"""Data needed to create a post."""
 input CreatePostInput {
-  """
-  Identifier of the post author.
-  """
+  """Identifier of the post author."""
   authorId: Int!
 
-  """
-  Post date in ISO 8601 format.
-  """
+  """Post date in ISO 8601 format."""
   date: String!
 
-  """
-  Post description.
-  """
+  """Post description."""
   desc: String!
 
-  """
-  Image URL or path for this post.
-  """
+  """Image URL or path for this post."""
   image: String!
 
-  """
-  Post event location.
-  """
+  """Post event location."""
   place: String!
 
-  """
-  Post title.
-  """
+  """Post title."""
   title: String!
 }
 
-"""
-Data needed to create a review.
-"""
+"""Data needed to create a review."""
 input CreateReviewInput {
-  """
-  Identifier of the review author.
-  """
+  """Identifier of the review author."""
   authorId: Int!
 
-  """
-  Review text.
-  """
+  """Review text."""
   content: String!
 
-  """
-  Identifier of the reviewed post.
-  """
+  """Identifier of the reviewed post."""
   postId: Int!
 
-  """
-  Optional rating from 1 to 5.
-  """
+  """Optional rating from 1 to 5."""
   rating: Int
 }
 
@@ -122,751 +76,453 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-"""
-Event created by a user and shared with users.
-"""
+"""Event created by a user and shared with users."""
 type EventModel {
-  """
-  User who created this event.
-  """
+  """User who created this event."""
   author: UserModel
 
-  """
-  Identifier of the event author.
-  """
+  """Identifier of the event author."""
   authorId: Int!
 
-  """
-  Event date and time.
-  """
+  """Event date and time."""
   date: DateTime!
 
-  """
-  Event description.
-  """
+  """Event description."""
   desc: String!
 
-  """
-  Unique event identifier.
-  """
+  """Unique event identifier."""
   id: Int!
 
-  """
-  Users registered for this event.
-  """
+  """Users registered for this event."""
   participants(
-    """
-    Items per page, up to 50.
-    """
+    """Items per page, up to 50."""
     limit: Int! = 10
 
-    """
-    Page number starting from 1.
-    """
+    """Page number starting from 1."""
     page: Int! = 1
   ): [UserModel!]
 
-  """
-  Event location.
-  """
+  """Event location."""
   place: String!
 
-  """
-  Event title.
-  """
+  """Event title."""
   title: String!
 }
 
-"""
-Data needed to log in.
-"""
+"""Data needed to log in."""
 input LoginInput {
-  """
-  User email address.
-  """
+  """User email address."""
   email: String!
 
-  """
-  User password.
-  """
+  """User password."""
   password: String!
 }
 
 type Mutation {
-  """
-  Create an event.
-  """
+  """Create an event."""
   createEvent(
-    """
-    Identifier of the event author.
-    """
+    """Identifier of the event author."""
     authorId: Int!
 
-    """
-    Event creation data.
-    """
+    """Event creation data."""
     input: CreateEventInput!
   ): EventModel!
 
-  """
-  Create a notification.
-  """
+  """Create a notification."""
   createNotification(
-    """
-    Notification creation data.
-    """
+    """Notification creation data."""
     input: CreateNotificationInput!
   ): NotificationModel!
 
-  """
-  Create a post.
-  """
+  """Create a post."""
   createPost(
-    """
-    Post creation data.
-    """
+    """Post creation data."""
     input: CreatePostInput!
   ): PostModel!
 
-  """
-  Create a review.
-  """
+  """Create a review."""
   createReview(
-    """
-    Review creation data.
-    """
+    """Review creation data."""
     input: CreateReviewInput!
   ): ReviewModel!
 
-  """
-  Delete an event.
-  """
+  """Delete an event."""
   deleteEvent(
-    """
-    Event identifier.
-    """
+    """Event identifier."""
     id: Int!
   ): EventModel!
 
-  """
-  Delete a notification.
-  """
+  """Delete a notification."""
   deleteNotification(
-    """
-    Notification identifier.
-    """
+    """Notification identifier."""
     id: Int!
 
-    """
-    Identifier of the notification recipient.
-    """
+    """Identifier of the notification recipient."""
     userId: Int!
   ): NotificationModel!
 
-  """
-  Delete a post.
-  """
+  """Delete a post."""
   deletePost(
-    """
-    Post identifier.
-    """
+    """Post identifier."""
     id: Int!
   ): Boolean!
 
-  """
-  Delete a review.
-  """
+  """Delete a review."""
   deleteReview(
-    """
-    Review identifier.
-    """
+    """Review identifier."""
     id: Int!
   ): ReviewModel!
 
-  """
-  Log in with email and password.
-  """
+  """Log in with email and password."""
   loginUser(
-    """
-    User login data.
-    """
+    """User login data."""
     input: LoginInput!
   ): AuthResultModel!
 
-  """
-  Mark a notification as read.
-  """
+  """Mark a notification as read."""
   markNotificationAsRead(
-    """
-    Notification identifier.
-    """
+    """Notification identifier."""
     id: Int!
 
-    """
-    Identifier of the notification recipient.
-    """
+    """Identifier of the notification recipient."""
     userId: Int!
   ): NotificationModel!
 
-  """
-  Mark a notification as unread.
-  """
+  """Mark a notification as unread."""
   markNotificationAsUnread(
-    """
-    Notification identifier.
-    """
+    """Notification identifier."""
     id: Int!
 
-    """
-    Identifier of the notification recipient.
-    """
+    """Identifier of the notification recipient."""
     userId: Int!
   ): NotificationModel!
 
-  """
-  Register a new user account.
-  """
+  """Register a new user account."""
   registerUser(
-    """
-    User registration data.
-    """
+    """User registration data."""
     input: RegisterUserInput!
   ): AuthResultModel!
 
-  """
-  Update an event.
-  """
+  """Update an event."""
   updateEvent(
-    """
-    Identifier of the event author.
-    """
+    """Identifier of the event author."""
     authorId: Int!
 
-    """
-    Event identifier.
-    """
+    """Event identifier."""
     id: Int!
 
-    """
-    Event fields to change.
-    """
+    """Event fields to change."""
     input: UpdateEventInput!
   ): EventModel!
 
-  """
-  Update a post.
-  """
+  """Update a post."""
   updatePost(
-    """
-    Post identifier.
-    """
+    """Post identifier."""
     id: Int!
 
-    """
-    Post fields to change.
-    """
+    """Post fields to change."""
     input: UpdatePostInput!
   ): PostModel!
 
-  """
-  Update a review.
-  """
+  """Update a review."""
   updateReview(
-    """
-    Review identifier.
-    """
+    """Review identifier."""
     id: Int!
 
-    """
-    Review fields to change.
-    """
+    """Review fields to change."""
     input: UpdateReviewInput!
 
-    """
-    Identifier of the review author.
-    """
+    """Identifier of the review author."""
     userId: Int!
   ): ReviewModel!
 }
 
-"""
-Notification sent to a user.
-"""
+"""Notification sent to a user."""
 type NotificationModel {
-  """
-  Notification creation date.
-  """
+  """Notification creation date."""
   createdAt: DateTime!
 
-  """
-  Unique notification identifier.
-  """
+  """Unique notification identifier."""
   id: Int!
 
-  """
-  Whether the notification was read.
-  """
+  """Whether the notification was read."""
   isRead: Boolean!
 
-  """
-  Notification message.
-  """
+  """Notification message."""
   message: String!
 
-  """
-  User who received this notification.
-  """
+  """User who received this notification."""
   user: UserModel
 
-  """
-  Identifier of the notification recipient.
-  """
+  """Identifier of the notification recipient."""
   userId: Int!
 }
 
-"""
-Post about an event or place.
-"""
+"""Post about an event or place."""
 type PostModel {
-  """
-  User who created this post.
-  """
+  """User who created this post."""
   author: UserModel
 
-  """
-  Identifier of the post author.
-  """
+  """Identifier of the post author."""
   authorId: Int!
 
-  """
-  Optional category identifier.
-  """
+  """Optional category identifier."""
   categoryId: Int
 
-  """
-  Post creation date.
-  """
+  """Post creation date."""
   createdAt: DateTime!
 
-  """
-  Post event date.
-  """
+  """Post event date."""
   date: DateTime!
 
-  """
-  Post description.
-  """
+  """Post description."""
   desc: String!
 
-  """
-  Unique post identifier.
-  """
+  """Unique post identifier."""
   id: Int!
 
-  """
-  Post event location.
-  """
+  """Post event location."""
   place: String!
 
-  """
-  Reviews written for this post.
-  """
+  """Reviews written for this post."""
   reviews(
-    """
-    Items per page, up to 50.
-    """
+    """Items per page, up to 50."""
     limit: Int! = 10
 
-    """
-    Page number starting from 1.
-    """
+    """Page number starting from 1."""
     page: Int! = 1
   ): [ReviewModel!]
 
-  """
-  Post title.
-  """
+  """Post title."""
   title: String!
 
-  """
-  Post last update date.
-  """
+  """Post last update date."""
   updatedAt: DateTime!
 }
 
 type Query {
-  """
-  Get an event by identifier.
-  """
+  """Get an event by identifier."""
   event(
-    """
-    Event identifier.
-    """
+    """Event identifier."""
     id: Int!
   ): EventModel
 
-  """
-  Get events visible to a user with pagination.
-  """
+  """Get events visible to a user with pagination."""
   events(
-    """
-    Items per page, up to 50.
-    """
+    """Items per page, up to 50."""
     limit: Int! = 10
 
-    """
-    Page number starting from 1.
-    """
+    """Page number starting from 1."""
     page: Int! = 1
 
-    """
-    Identifier of the current user.
-    """
+    """Identifier of the current user."""
     userId: Int!
   ): [EventModel!]!
 
-  """
-  Get a notification by identifier.
-  """
+  """Get a notification by identifier."""
   notification(
-    """
-    Notification identifier.
-    """
+    """Notification identifier."""
     id: Int!
   ): NotificationModel
 
-  """
-  Get notifications addressed to a user with pagination.
-  """
+  """Get notifications addressed to a user with pagination."""
   notifications(
-    """
-    Items per page, up to 50.
-    """
+    """Items per page, up to 50."""
     limit: Int! = 10
 
-    """
-    Page number starting from 1.
-    """
+    """Page number starting from 1."""
     page: Int! = 1
 
-    """
-    Identifier of the notification recipient.
-    """
+    """Identifier of the notification recipient."""
     userId: Int!
   ): [NotificationModel!]!
 
-  """
-  Get a post by identifier.
-  """
+  """Get a post by identifier."""
   post(
-    """
-    Post identifier.
-    """
+    """Post identifier."""
     id: Int!
   ): PostModel
 
-  """
-  Get posts list with pagination.
-  """
+  """Get posts list with pagination."""
   posts(
-    """
-    Items per page, up to 50.
-    """
+    """Items per page, up to 50."""
     limit: Int! = 10
 
-    """
-    Page number starting from 1.
-    """
+    """Page number starting from 1."""
     page: Int! = 1
 
-    """
-    Case-insensitive title fragment.
-    """
+    """Case-insensitive title fragment."""
     search: String
   ): [PostModel!]!
 
-  """
-  Get a review by identifier.
-  """
+  """Get a review by identifier."""
   review(
-    """
-    Review identifier.
-    """
+    """Review identifier."""
     id: Int!
   ): ReviewModel
 
-  """
-  Get reviews list with pagination.
-  """
+  """Get reviews list with pagination."""
   reviews(
-    """
-    Items per page, up to 50.
-    """
+    """Items per page, up to 50."""
     limit: Int! = 10
 
-    """
-    Page number starting from 1.
-    """
+    """Page number starting from 1."""
     page: Int! = 1
   ): [ReviewModel!]!
 
-  """
-  Search users by email fragment.
-  """
+  """Search users by email fragment."""
   searchUsers(
-    """
-    Case-insensitive email fragment.
-    """
+    """Case-insensitive email fragment."""
     email: String!
   ): [UserModel!]!
 
-  """
-  Get a user by identifier.
-  """
+  """Get a user by identifier."""
   user(
-    """
-    User identifier.
-    """
+    """User identifier."""
     id: Int!
   ): UserModel
 }
 
-"""
-Data needed to register a new user.
-"""
+"""Data needed to register a new user."""
 input RegisterUserInput {
-  """
-  User email address.
-  """
+  """User email address."""
   email: String!
 
-  """
-  User display name.
-  """
+  """User display name."""
   name: String!
 
-  """
-  User password.
-  """
+  """User password."""
   password: String!
 }
 
-"""
-Review left by a user for a post.
-"""
+"""Review left by a user for a post."""
 type ReviewModel {
-  """
-  User who wrote this review.
-  """
+  """User who wrote this review."""
   author: UserModel
 
-  """
-  Identifier of the review author.
-  """
+  """Identifier of the review author."""
   authorId: Int!
 
-  """
-  Review text.
-  """
+  """Review text."""
   content: String!
 
-  """
-  Review creation date.
-  """
+  """Review creation date."""
   createdAt: DateTime!
 
-  """
-  Unique review identifier.
-  """
+  """Unique review identifier."""
   id: Int!
 
-  """
-  Post that received this review.
-  """
+  """Post that received this review."""
   post: PostModel
 
-  """
-  Identifier of the reviewed post.
-  """
+  """Identifier of the reviewed post."""
   postId: Int!
 
-  """
-  Optional rating from 1 to 5.
-  """
+  """Optional rating from 1 to 5."""
   rating: Int
 
-  """
-  Review last update date.
-  """
+  """Review last update date."""
   updatedAt: DateTime!
 }
 
-"""
-Data that can be changed in an event.
-"""
+"""Data that can be changed in an event."""
 input UpdateEventInput {
-  """
-  Event date in ISO 8601 format.
-  """
+  """Event date in ISO 8601 format."""
   date: String
 
-  """
-  Event description.
-  """
+  """Event description."""
   desc: String
 
-  """
-  Event location.
-  """
+  """Event location."""
   place: String
 
-  """
-  Event title.
-  """
+  """Event title."""
   title: String
 
-  """
-  Email addresses of users registered for the event.
-  """
+  """Email addresses of users registered for the event."""
   users: [String!]
 }
 
-"""
-Data that can be changed in a post.
-"""
+"""Data that can be changed in a post."""
 input UpdatePostInput {
-  """
-  Identifier of the post author.
-  """
+  """Identifier of the post author."""
   authorId: Int
 
-  """
-  Post date in ISO 8601 format.
-  """
+  """Post date in ISO 8601 format."""
   date: String
 
-  """
-  Post description.
-  """
+  """Post description."""
   desc: String
 
-  """
-  Image URL or path for this post.
-  """
+  """Image URL or path for this post."""
   image: String
 
-  """
-  Post event location.
-  """
+  """Post event location."""
   place: String
 
-  """
-  Post title.
-  """
+  """Post title."""
   title: String
 }
 
-"""
-Data that can be changed in a review.
-"""
+"""Data that can be changed in a review."""
 input UpdateReviewInput {
-  """
-  Review text.
-  """
+  """Review text."""
   content: String
 
-  """
-  Optional rating from 1 to 5.
-  """
+  """Optional rating from 1 to 5."""
   rating: Int
 }
 
-"""
-Application user without password data.
-"""
+"""Application user without password data."""
 type UserModel {
-  """
-  Events authored by this user.
-  """
+  """Events authored by this user."""
   authoredEvents(
-    """
-    Items per page, up to 50.
-    """
+    """Items per page, up to 50."""
     limit: Int! = 10
 
-    """
-    Page number starting from 1.
-    """
+    """Page number starting from 1."""
     page: Int! = 1
   ): [EventModel!]
 
-  """
-  User avatar URL or local path.
-  """
+  """User avatar URL or local path."""
   avatar: String!
 
-  """
-  User email address.
-  """
+  """User email address."""
   email: String!
 
-  """
-  Unique user identifier.
-  """
+  """Unique user identifier."""
   id: Int!
 
-  """
-  User display name.
-  """
+  """User display name."""
   name: String!
 
-  """
-  Notifications addressed to this user.
-  """
+  """Notifications addressed to this user."""
   notifications(
-    """
-    Items per page, up to 50.
-    """
+    """Items per page, up to 50."""
     limit: Int! = 10
 
-    """
-    Page number starting from 1.
-    """
+    """Page number starting from 1."""
     page: Int! = 1
   ): [NotificationModel!]
 
-  """
-  Posts created by this user.
-  """
+  """Posts created by this user."""
   posts(
-    """
-    Items per page, up to 50.
-    """
+    """Items per page, up to 50."""
     limit: Int! = 10
 
-    """
-    Page number starting from 1.
-    """
+    """Page number starting from 1."""
     page: Int! = 1
   ): [PostModel!]
 
-  """
-  Reviews created by this user.
-  """
+  """Reviews created by this user."""
   reviews(
-    """
-    Items per page, up to 50.
-    """
+    """Items per page, up to 50."""
     limit: Int! = 10
 
-    """
-    Page number starting from 1.
-    """
+    """Page number starting from 1."""
     page: Int! = 1
   ): [ReviewModel!]
 
-  """
-  User authorization role.
-  """
+  """User authorization role."""
   role: String!
 }

@@ -38,7 +38,7 @@ export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
   @Post()
-  @ApiCookieAuth()
+  @ApiCookieAuth('sAccessToken')
   @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Create a review' })
   @ApiBody({ type: CreateReviewDto })
@@ -86,7 +86,7 @@ export class ReviewsController {
   }
 
   @Patch(':id')
-  @ApiCookieAuth()
+  @ApiCookieAuth('sAccessToken')
   @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Update review' })
   @ApiParam({ name: 'id', type: Number })
@@ -109,7 +109,7 @@ export class ReviewsController {
   }
 
   @Delete(':id')
-  @ApiCookieAuth()
+  @ApiCookieAuth('sAccessToken')
   @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Delete review' })
   @ApiParam({ name: 'id', type: Number })

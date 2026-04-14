@@ -4,35 +4,55 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { LoginDto } from './dto/login.dto';
-import { AuthRepository } from './entities/auth.repository';
+import type { UserRole } from '@prisma/client';
+import type { Request, Response } from 'express';
+import type { User as SuperTokensUser } from 'supertokens-node/lib/build/types';
+import type { SessionContainer } from 'supertokens-node/recipe/session';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { SuperTokensAuthService } from 'src/infrastructure/auth/supertokens-auth.service';
+import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.gto';
-import { UserRole } from '@prisma/client';
+import { AuthRepository } from './entities/auth.repository';
 
 @Injectable()
 export class AuthService {
   private authRepository: AuthRepository;
-  constructor(private prisma: PrismaService) {
+
+  constructor(
+    private prisma: PrismaService,
+    private readonly superTokensAuth: SuperTokensAuthService,
+  ) {
     this.authRepository = new AuthRepository(prisma);
   }
 
-  async login(dto: LoginDto) {
-    const user = await this.authRepository.findOne(dto.email);
+  async login(dto: LoginDto, req: Request, res: Response) {
+    let providerResult = await this.superTokensAuth.signIn(
+      dto.email,
+      dto.password,
+    );
 
-    if (!user) {
-      throw new NotFoundException({
-        type: 'email',
-        message: 'Пользователя с такой почтой не существует',
-      });
+    if (providerResult.status === 'WRONG_CREDENTIALS_ERROR') {
+      providerResult = await this.tryMigrateLegacyUser(dto);
     }
 
-    if (user.password !== dto.password) {
+    if (providerResult.status !== 'OK') {
       throw new UnauthorizedException({
         type: 'password',
-        message: 'Неверный пароль',
+        message: 'РќРµРІРµСЂРЅС‹Р№ РїР°СЂРѕР»СЊ',
       });
     }
+
+    const user = await this.syncProviderUser(providerResult.user, dto.password);
+
+    await this.superTokensAuth.createSession(
+      req,
+      res,
+      providerResult.recipeUserId,
+      {
+        localUserId: user.id,
+        role: user.role,
+      },
+    );
 
     return {
       userId: user.id,
@@ -40,17 +60,44 @@ export class AuthService {
     };
   }
 
-  async register(dto: RegisterDto) {
+  async register(dto: RegisterDto, req: Request, res: Response) {
     const existingUser = await this.authRepository.findOne(dto.email);
 
     if (existingUser) {
       throw new BadRequestException({
         type: 'email',
-        message: 'Пользователь с такой почтой уже существует',
+        message:
+          'РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃ С‚Р°РєРѕР№ РїРѕС‡С‚РѕР№ СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚',
       });
     }
 
-    const user = await this.authRepository.create(dto);
+    const providerResult = await this.superTokensAuth.signUp(
+      dto.email,
+      dto.password,
+    );
+
+    if (providerResult.status === 'EMAIL_ALREADY_EXISTS_ERROR') {
+      throw new BadRequestException({
+        type: 'email',
+        message:
+          'РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃ С‚Р°РєРѕР№ РїРѕС‡С‚РѕР№ СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚',
+      });
+    }
+
+    const user = await this.authRepository.create({
+      ...dto,
+      supertokensId: providerResult.user.id,
+    });
+
+    await this.superTokensAuth.createSession(
+      req,
+      res,
+      providerResult.recipeUserId,
+      {
+        localUserId: user.id,
+        role: user.role,
+      },
+    );
 
     return {
       userId: user.id,
@@ -66,6 +113,124 @@ export class AuthService {
     }
 
     return this.toAuthUser(user);
+  }
+
+  async resolveSessionUser(session: SessionContainer) {
+    const payload = session.getAccessTokenPayload() as {
+      localUserId?: number;
+    };
+
+    if (payload.localUserId) {
+      try {
+        return await this.validateUser(payload.localUserId);
+      } catch {
+        // The local profile can be removed while the SuperTokens session remains valid.
+      }
+    }
+
+    const providerUserId = session.getUserId();
+    let user = await this.authRepository.findBySupertokensId(providerUserId);
+
+    if (!user) {
+      const providerUser =
+        await this.superTokensAuth.getProviderUser(providerUserId);
+
+      if (!providerUser) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      user = await this.syncProviderUser(providerUser);
+    }
+
+    await session.mergeIntoAccessTokenPayload({
+      localUserId: user.id,
+      role: user.role,
+    });
+
+    return this.toAuthUser(user);
+  }
+
+  private async tryMigrateLegacyUser(dto: LoginDto) {
+    const legacyUser = await this.authRepository.findOne(dto.email);
+
+    if (!legacyUser) {
+      throw new NotFoundException({
+        type: 'email',
+        message:
+          'РџРѕР»СЊР·РѕРІР°С‚РµР»СЏ СЃ С‚Р°РєРѕР№ РїРѕС‡С‚РѕР№ РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚',
+      });
+    }
+
+    if (legacyUser.supertokensId || legacyUser.password !== dto.password) {
+      throw new UnauthorizedException({
+        type: 'password',
+        message: 'РќРµРІРµСЂРЅС‹Р№ РїР°СЂРѕР»СЊ',
+      });
+    }
+
+    const signUpResult = await this.superTokensAuth.signUp(
+      dto.email,
+      dto.password,
+    );
+
+    if (signUpResult.status !== 'OK') {
+      throw new UnauthorizedException({
+        type: 'password',
+        message: 'РќРµРІРµСЂРЅС‹Р№ РїР°СЂРѕР»СЊ',
+      });
+    }
+
+    await this.authRepository.linkSupertokensUser(
+      legacyUser.id,
+      signUpResult.user.id,
+    );
+
+    return signUpResult;
+  }
+
+  private async syncProviderUser(providerUser: SuperTokensUser, password = '') {
+    const email = this.extractEmail(providerUser);
+    const existingByProvider = await this.authRepository.findBySupertokensId(
+      providerUser.id,
+    );
+
+    if (existingByProvider) {
+      return existingByProvider;
+    }
+
+    const existingByEmail = await this.authRepository.findOne(email);
+
+    if (existingByEmail) {
+      if (!existingByEmail.supertokensId) {
+        return this.authRepository.linkSupertokensUser(
+          existingByEmail.id,
+          providerUser.id,
+        );
+      }
+
+      return existingByEmail;
+    }
+
+    return this.authRepository.create({
+      email,
+      password: password || `supertokens:${providerUser.id}`,
+      name: this.nameFromEmail(email),
+      supertokensId: providerUser.id,
+    });
+  }
+
+  private extractEmail(providerUser: SuperTokensUser) {
+    const email = providerUser.emails[0];
+
+    if (!email) {
+      throw new UnauthorizedException('SuperTokens user has no email');
+    }
+
+    return email;
+  }
+
+  private nameFromEmail(email: string) {
+    return email.split('@')[0] || 'User';
   }
 
   private toAuthUser(user: {
