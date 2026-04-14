@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import {
   BadRequestException,
   Injectable,
@@ -38,7 +39,7 @@ export class AuthService {
     if (providerResult.status !== 'OK') {
       throw new UnauthorizedException({
         type: 'password',
-        message: 'РќРµРІРµСЂРЅС‹Р№ РїР°СЂРѕР»СЊ',
+        message: 'Неверный пароль',
       });
     }
 
@@ -67,7 +68,7 @@ export class AuthService {
       throw new BadRequestException({
         type: 'email',
         message:
-          'РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃ С‚Р°РєРѕР№ РїРѕС‡С‚РѕР№ СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚',
+          'Пользователь с такой почтой уже существует. Пожалуйста, войдите или используйте другую почту для регистрации.',
       });
     }
 
@@ -80,7 +81,7 @@ export class AuthService {
       throw new BadRequestException({
         type: 'email',
         message:
-          'РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃ С‚Р°РєРѕР№ РїРѕС‡С‚РѕР№ СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚',
+          'Пользователь с такой почтой уже существует. Пожалуйста, войдите или используйте другую почту для регистрации.',
       });
     }
 
@@ -156,15 +157,14 @@ export class AuthService {
     if (!legacyUser) {
       throw new NotFoundException({
         type: 'email',
-        message:
-          'РџРѕР»СЊР·РѕРІР°С‚РµР»СЏ СЃ С‚Р°РєРѕР№ РїРѕС‡С‚РѕР№ РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚',
+        message: 'Пользователь с такой почтой не существует',
       });
     }
 
     if (legacyUser.supertokensId || legacyUser.password !== dto.password) {
       throw new UnauthorizedException({
         type: 'password',
-        message: 'РќРµРІРµСЂРЅС‹Р№ РїР°СЂРѕР»СЊ',
+        message: 'Неверный пароль',
       });
     }
 
@@ -176,7 +176,7 @@ export class AuthService {
     if (signUpResult.status !== 'OK') {
       throw new UnauthorizedException({
         type: 'password',
-        message: 'РќРµРІРµСЂРЅС‹Р№ РїР°СЂРѕР»СЊ',
+        message: 'Неверный пароль',
       });
     }
 
@@ -188,7 +188,18 @@ export class AuthService {
     return signUpResult;
   }
 
-  private async syncProviderUser(providerUser: SuperTokensUser, password = '') {
+  private async syncProviderUser(
+    providerUser: SuperTokensUser,
+    password = '',
+  ): Promise<{
+    id: number;
+    email: string;
+    supertokensId: string | null;
+    name: string;
+    password: string;
+    avatar: string;
+    role: UserRole;
+  }> {
     const email = this.extractEmail(providerUser);
     const existingByProvider = await this.authRepository.findBySupertokensId(
       providerUser.id,

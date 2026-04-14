@@ -1,6 +1,7 @@
 import { PrismaService } from 'src/prisma/prisma.service';
 import { LoginDto } from '../dto/login.dto';
 import { RegisterDto } from '../dto/register.gto';
+import { UserRole } from '@prisma/client';
 
 export class AuthRepository {
   constructor(private prisma: PrismaService) {}
@@ -34,7 +35,18 @@ export class AuthRepository {
     });
   }
 
-  async linkSupertokensUser(id: number, supertokensId: string) {
+  async linkSupertokensUser(
+    id: number,
+    supertokensId: string,
+  ): Promise<{
+    id: number;
+    email: string;
+    supertokensId: string | null;
+    name: string;
+    password: string;
+    avatar: string;
+    role: UserRole;
+  }> {
     return await this.prisma.user.update({
       where: { id },
       data: { supertokensId },

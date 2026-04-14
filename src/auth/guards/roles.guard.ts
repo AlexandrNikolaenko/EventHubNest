@@ -28,6 +28,7 @@ export class RolesGuard implements CanActivate {
       return false;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (user.role === UserRole.ADMIN || roles.includes(user.role)) {
       return true;
     }
