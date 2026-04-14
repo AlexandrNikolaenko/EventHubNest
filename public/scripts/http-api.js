@@ -14,11 +14,12 @@ class HttpRequest {
         method,
         credentials: 'same-origin',
         cache: method === 'GET' ? 'default' : 'no-store',
-        headers: body && !isFormData
-          ? {
-              'Content-Type': 'application/json',
-            }
-          : undefined,
+        headers:
+          body && !isFormData
+            ? {
+                'Content-Type': 'application/json',
+              }
+            : undefined,
         body: body ? (isFormData ? body : JSON.stringify(body)) : undefined,
       });
 

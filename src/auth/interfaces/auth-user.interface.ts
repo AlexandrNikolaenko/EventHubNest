@@ -7,4 +7,3 @@ export interface AuthUser {
   avatar: string;
   role: UserRole;
 }
-

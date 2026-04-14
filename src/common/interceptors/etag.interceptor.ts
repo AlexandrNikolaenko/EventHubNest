@@ -61,7 +61,7 @@ export class EtagInterceptor implements NestInterceptor {
 
   private hasMatchingEtag(request: Request, etag: string) {
     const value = request.headers['if-none-match'];
-    const candidates = Array.isArray(value) ? value : value?.split(',') ?? [];
+    const candidates = Array.isArray(value) ? value : (value?.split(',') ?? []);
 
     return candidates.some((candidate) => candidate.trim() === etag);
   }

@@ -9,4 +9,3 @@ export const defaultAuthOptions: AuthModuleOptions = {
   expiresInSeconds: 60 * 60 * 24 * 7,
   jwtSecret: 'dev-secret-change-me',
 };
-

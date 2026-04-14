@@ -639,7 +639,13 @@ export class EventFieldsResolver {
       take: params.limit,
       include: {
         user: {
-          select: { id: true, name: true, email: true, avatar: true, role: true },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            avatar: true,
+            role: true,
+          },
         },
       },
       orderBy: { id: 'asc' },

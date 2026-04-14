@@ -4,4 +4,3 @@ import { AuthUser } from './auth-user.interface';
 export interface AuthRequest extends Request {
   authUser?: AuthUser;
 }
-

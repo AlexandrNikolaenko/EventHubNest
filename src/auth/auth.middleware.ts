@@ -50,6 +50,8 @@ export class AuthMiddleware implements NestMiddleware {
     const cookies = header?.split(';') ?? [];
     const cookie = cookies.find((item) => item.trim().startsWith(`${name}=`));
 
-    return cookie ? decodeURIComponent(cookie.split('=').slice(1).join('=')) : '';
+    return cookie
+      ? decodeURIComponent(cookie.split('=').slice(1).join('='))
+      : '';
   }
 }

@@ -76,10 +76,7 @@ export class ApiPostsController {
   })
   @ApiBadRequestResponse({ description: 'Invalid payload' })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
-  create(
-    @Body() createPostDto: CreatePostDto,
-    @CurrentUser() user: AuthUser,
-  ) {
+  create(@Body() createPostDto: CreatePostDto, @CurrentUser() user: AuthUser) {
     return this.postsService.create({ ...createPostDto, authorId: user.id });
   }
 
