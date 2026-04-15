@@ -6,7 +6,6 @@ import {
   Param,
   Delete,
   Patch,
-  ParseIntPipe,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -31,6 +30,7 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import type { AuthUser } from 'src/auth/interfaces/auth-user.interface';
+import { PositiveIntPipe } from 'src/common/pipes/positive-int.pipe';
 
 @ApiTags('Reviews')
 @Controller('api/reviews')
@@ -74,14 +74,14 @@ export class ReviewsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get review by id' })
-  @ApiParam({ name: 'id', type: Number })
+  @ApiParam({ name: 'id', type: Number, description: 'id > 0' })
   @ApiResponse({
     status: 200,
     description: 'Review data',
     type: CreateReviewDto,
   })
   @ApiNotFoundResponse({ description: 'Review not found' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id', PositiveIntPipe) id: number) {
     return this.reviewsService.findOne(id);
   }
 
@@ -89,7 +89,7 @@ export class ReviewsController {
   @ApiCookieAuth('sAccessToken')
   @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Update review' })
-  @ApiParam({ name: 'id', type: Number })
+  @ApiParam({ name: 'id', type: Number, description: 'id > 0' })
   @ApiQuery({ name: 'userId', required: true, type: Number })
   @ApiBody({ type: UpdateReviewDto })
   @ApiResponse({
@@ -100,7 +100,7 @@ export class ReviewsController {
   @ApiNotFoundResponse({ description: 'Review not found' })
   @ApiBadRequestResponse({ description: 'Invalid input' })
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', PositiveIntPipe) id: number,
     @CurrentUser() user: AuthUser,
     @Query('userId') _userId: string,
     @Body() dto: UpdateReviewDto,
@@ -112,14 +112,13 @@ export class ReviewsController {
   @ApiCookieAuth('sAccessToken')
   @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Delete review' })
-  @ApiParam({ name: 'id', type: Number })
+  @ApiParam({ name: 'id', type: Number, description: 'id > 0' })
   @ApiQuery({ name: 'userId', required: false, type: Number })
   @ApiNoContentResponse({ description: 'Review deleted' })
   @ApiNotFoundResponse({ description: 'Review not found' })
   remove(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', PositiveIntPipe) id: number,
     @CurrentUser() user: AuthUser,
-    @Query('userId') _userId?: string,
   ) {
     return this.reviewsService.remove(id, user.id, user.role);
   }

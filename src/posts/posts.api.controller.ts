@@ -42,6 +42,7 @@ import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import type { AuthUser } from 'src/auth/interfaces/auth-user.interface';
 import { UserRole } from '@prisma/client';
+import { PositiveIntPipe } from 'src/common/pipes/positive-int.pipe';
 
 @ApiTags('Posts')
 @Controller('api/posts')
@@ -132,19 +133,19 @@ export class ApiPostsController {
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(5000)
   @ApiOperation({ summary: 'Get post by id' })
-  @ApiParam({ name: 'id', type: Number })
+  @ApiParam({ name: 'id', type: Number, description: 'id > 0' })
   @ApiResponse({ status: 200, description: 'Post data', type: CreatePostDto })
   @ApiNotFoundResponse({ description: 'Post not found' })
   @ApiBadRequestResponse({ description: 'Invalid id' })
-  findOne(@Param('id') id: string) {
-    return this.postsService.findOne(Number(id));
+  findOne(@Param('id', PositiveIntPipe) id: number) {
+    return this.postsService.findOne(id);
   }
 
   @Patch(':id')
   @ApiCookieAuth('sAccessToken')
   @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Update post by id' })
-  @ApiParam({ name: 'id', type: Number })
+  @ApiParam({ name: 'id', type: Number, description: 'id > 0' })
   @ApiBody({ type: UpdatePostDto })
   @ApiResponse({
     status: 200,
@@ -153,20 +154,22 @@ export class ApiPostsController {
   })
   @ApiNotFoundResponse({ description: 'Post not found' })
   @ApiBadRequestResponse({ description: 'Invalid payload or id' })
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postsService.update(+id, updatePostDto);
+  update(
+    @Param('id', PositiveIntPipe) id: number,
+    @Body() updatePostDto: UpdatePostDto,
+  ) {
+    return this.postsService.update(id, updatePostDto);
   }
 
   @Delete(':id')
   @ApiCookieAuth('sAccessToken')
   @UseGuards(AuthGuard, RolesGuard)
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Delete post by id' })
-  @ApiParam({ name: 'id', type: Number })
+  @ApiParam({ name: 'id', type: Number, description: 'id > 0' })
   @ApiNoContentResponse({ description: 'Post deleted' })
   @ApiNotFoundResponse({ description: 'Post not found' })
-  remove(@Param('id') id: string) {
-    return this.postsService.remove(+id);
+  remove(@Param('id', PositiveIntPipe) id: number) {
+    return this.postsService.remove(id);
   }
 }

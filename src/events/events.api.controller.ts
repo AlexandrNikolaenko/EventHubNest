@@ -28,6 +28,7 @@ import {
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiProperty,
+  ApiPropertyOptional,
   ApiCookieAuth,
 } from '@nestjs/swagger';
 import { ValidateNested } from 'class-validator';
@@ -36,6 +37,7 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import type { AuthUser } from 'src/auth/interfaces/auth-user.interface';
+import { PositiveIntPipe } from 'src/common/pipes/positive-int.pipe';
 
 export class CreateEventRequestDto {
   @ApiProperty({ example: 1 })
@@ -48,10 +50,10 @@ export class CreateEventRequestDto {
 }
 
 export class UpdateEventRequestDto {
-  @ApiProperty({ example: 1 })
+  @ApiPropertyOptional({ example: 1 })
   authorId!: number;
 
-  @ApiProperty({ type: UpdateEventDto })
+  @ApiPropertyOptional({ type: UpdateEventDto })
   @ValidateNested()
   @Type(() => UpdateEventDto)
   dto!: UpdateEventDto;
@@ -149,7 +151,7 @@ export class ApiEventsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get event by id' })
-  @ApiParam({ name: 'id', type: Number, description: 'Event id' })
+  @ApiParam({ name: 'id', type: Number, description: 'id > 0' })
   @ApiResponse({
     status: 200,
     description: 'Event in detail',
@@ -157,13 +159,13 @@ export class ApiEventsController {
   })
   @ApiNotFoundResponse({ description: 'Event not found' })
   @ApiBadRequestResponse({ description: 'Invalid id' })
-  findOne(@Param('id') id: string) {
-    return this.eventsService.findOne(Number(id));
+  findOne(@Param('id', PositiveIntPipe) id: number) {
+    return this.eventsService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update event by id' })
-  @ApiParam({ name: 'id', type: Number, description: 'Event id' })
+  @ApiParam({ name: 'id', type: Number, description: 'id > 0' })
   @ApiBody({ type: UpdateEventRequestDto })
   @ApiResponse({
     status: 200,
@@ -173,19 +175,22 @@ export class ApiEventsController {
   @ApiNotFoundResponse({ description: 'Event not found' })
   @ApiBadRequestResponse({ description: 'Invalid payload or id' })
   update(
-    @Param('id') id: string,
+    @Param('id', PositiveIntPipe) id: number,
     @Body() { dto }: { authorId: number; dto: UpdateEventDto },
     @CurrentUser() user: AuthUser,
   ) {
-    return this.eventsService.update(Number(id), user.id, dto, user.role);
+    return this.eventsService.update(id, user.id, dto, user.role);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete event by id' })
-  @ApiParam({ name: 'id', type: Number, description: 'Event id' })
+  @ApiParam({ name: 'id', type: Number, description: 'id > 0' })
   @ApiNoContentResponse({ description: 'Event deleted' })
   @ApiNotFoundResponse({ description: 'Event not found' })
-  remove(@Param('id') id: string, @CurrentUser() user: AuthUser) {
-    return this.eventsService.remove(Number(id), user.id, user.role);
+  remove(
+    @Param('id', PositiveIntPipe) id: number,
+    @CurrentUser() user: AuthUser,
+  ) {
+    return this.eventsService.remove(id, user.id, user.role);
   }
 }

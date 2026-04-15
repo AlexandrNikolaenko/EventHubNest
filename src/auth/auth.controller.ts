@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Body, Render, Res, Req } from '@nestjs/common';
 import {
+  ApiBody,
   ApiCookieAuth,
   ApiExcludeController,
   ApiOperation,
@@ -27,6 +28,7 @@ export class ApiAuthController {
   @ApiOperation({
     summary: 'Log in through SuperTokens and set session cookies',
   })
+  @ApiBody({ type: LoginDto })
   async login(
     @Body() createAuthDto: LoginDto,
     @Req() request: Request,
@@ -39,6 +41,7 @@ export class ApiAuthController {
   @ApiOperation({
     summary: 'Register through SuperTokens and set session cookies',
   })
+  @ApiBody({ type: RegisterDto })
   async register(
     @Body() createAuthDto: RegisterDto,
     @Req() request: Request,

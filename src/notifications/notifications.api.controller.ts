@@ -9,7 +9,6 @@ import {
   Query,
   Sse,
   MessageEvent,
-  ParseIntPipe,
   UseGuards,
 } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
@@ -37,6 +36,7 @@ import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import type { AuthUser } from 'src/auth/interfaces/auth-user.interface';
 import { UserRole } from '@prisma/client';
+import { PositiveIntPipe } from 'src/common/pipes/positive-int.pipe';
 
 @ApiTags('Notifications')
 @ApiCookieAuth('sAccessToken')
@@ -64,10 +64,7 @@ export class NotificationsController {
       },
     },
   })
-  sse(
-    @CurrentUser() user: AuthUser,
-    @Query('userId') _userId?: string,
-  ): Observable<MessageEvent> {
+  sse(@CurrentUser() user: AuthUser): Observable<MessageEvent> {
     return this.notificationsService.getUserStream(user.id);
   }
 
@@ -112,20 +109,20 @@ export class NotificationsController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get notification by id' })
-  @ApiParam({ name: 'id', type: Number })
+  @ApiParam({ name: 'id', type: Number, description: 'id > 0' })
   @ApiResponse({
     status: 200,
     description: 'Notification data',
     type: CreateNotificationDto,
   })
   @ApiNotFoundResponse({ description: 'Notification not found' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id', PositiveIntPipe) id: number) {
     return this.notificationsService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update notification state' })
-  @ApiParam({ name: 'id', type: Number })
+  @ApiParam({ name: 'id', type: Number, description: 'id > 0' })
   @ApiQuery({ name: 'userId', required: true, type: Number })
   @ApiBody({ type: UpdateNotificationDto })
   @ApiResponse({
@@ -136,7 +133,7 @@ export class NotificationsController {
   @ApiBadRequestResponse({ description: 'Invalid data' })
   @ApiNotFoundResponse({ description: 'Notification not found' })
   update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', PositiveIntPipe) id: number,
     @CurrentUser() user: AuthUser,
     @Query('userId') _userId: string,
     @Body() dto: UpdateNotificationDto,
@@ -146,14 +143,13 @@ export class NotificationsController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete notification by id' })
-  @ApiParam({ name: 'id', type: Number })
+  @ApiParam({ name: 'id', type: Number, description: 'id > 0' })
   @ApiQuery({ name: 'userId', required: true, type: Number })
   @ApiNoContentResponse({ description: 'Deleted successfully' })
   @ApiNotFoundResponse({ description: 'Notification not found' })
   remove(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', PositiveIntPipe) id: number,
     @CurrentUser() user: AuthUser,
-    @Query('userId') _userId: string,
   ) {
     return this.notificationsService.remove(id, user.id, user.role);
   }

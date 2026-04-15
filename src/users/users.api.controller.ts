@@ -4,7 +4,6 @@ import {
   Header,
   Param,
   ParseFilePipe,
-  ParseIntPipe,
   Patch,
   Query,
   UploadedFile,
@@ -22,6 +21,7 @@ import {
   ApiOperation,
   ApiQuery,
   ApiResponse,
+  ApiParam,
   ApiBadRequestResponse,
   ApiNotFoundResponse,
   ApiConsumes,
@@ -34,6 +34,7 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import type { AuthUser } from 'src/auth/interfaces/auth-user.interface';
+import { PositiveIntPipe } from 'src/common/pipes/positive-int.pipe';
 
 @ApiTags('Users')
 @ApiCookieAuth('sAccessToken')
@@ -69,6 +70,7 @@ export class UsersApiController {
   @Header('Cache-Control', 'private, no-cache')
   @UseGuards(AuthGuard, RolesGuard)
   @ApiOperation({ summary: 'Get user by id' })
+  @ApiParam({ name: 'id', type: Number, description: 'id > 0' })
   @ApiResponse({
     status: 200,
     description: 'User data',
@@ -76,7 +78,7 @@ export class UsersApiController {
   })
   @ApiNotFoundResponse({ description: 'User not found' })
   findOne(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', PositiveIntPipe) id: number,
     @CurrentUser() user: AuthUser,
   ) {
     this.assertSelfOrAdmin(id, user);
@@ -85,6 +87,7 @@ export class UsersApiController {
 
   @Patch(':id/avatar')
   @ApiOperation({ summary: 'Upload user avatar' })
+  @ApiParam({ name: 'id', type: Number, description: 'id > 0' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -108,7 +111,7 @@ export class UsersApiController {
   @UseInterceptors(FileInterceptor('avatar'))
   @UseGuards(AuthGuard, RolesGuard)
   async updateAvatar(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', PositiveIntPipe) id: number,
     @CurrentUser() user: AuthUser,
     @UploadedFile(
       new ParseFilePipe({

@@ -1,20 +1,18 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsNumber, IsOptional } from 'class-validator';
 
 export class UpdateReviewDto {
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'Great event!',
     description: 'Review content',
-    required: false,
   })
   @IsString()
   @IsOptional()
   content?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 5,
     description: 'Rating from 1 to 5',
-    required: false,
   })
   @IsNumber()
   @IsOptional()
