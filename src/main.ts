@@ -73,7 +73,6 @@ async function bootstrap() {
       req.authUser = await authService.resolveSessionUser(session);
       res.locals.currentUser = req.authUser;
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (req.authUser.role !== UserRole.ADMIN) {
         return rejectForbidden(req, res);
       }

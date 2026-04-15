@@ -655,7 +655,6 @@ export class EventFieldsResolver {
       orderBy: { id: 'asc' },
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return registrations.map((registration) => registration.user);
   }
 }
