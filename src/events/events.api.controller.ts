@@ -37,7 +37,7 @@ import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import type { AuthUser } from 'src/auth/interfaces/auth-user.interface';
-import { PositiveIntPipe } from 'src/common/pipes/positive-int.pipe';
+import { PositiveIntPipe } from 'src/common/pipes/positive-int';
 
 export class CreateEventRequestDto {
   @ApiProperty({ example: 1 })

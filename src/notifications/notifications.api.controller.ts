@@ -36,7 +36,7 @@ import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import type { AuthUser } from 'src/auth/interfaces/auth-user.interface';
 import { UserRole } from '@prisma/client';
-import { PositiveIntPipe } from 'src/common/pipes/positive-int.pipe';
+import { PositiveIntPipe } from 'src/common/pipes/positive-int';
 
 @ApiTags('Notifications')
 @ApiCookieAuth('sAccessToken')
